@@ -3,7 +3,7 @@ title: |
   High Returns, Low Investment: the Euler Equation Puzzle and Collective Action
 format:
   aea-pdf:
-    keep-tex: true  
+    keep-tex: false  
     journal:
       blinded: false
     indent: true
