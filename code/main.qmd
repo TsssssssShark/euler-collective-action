@@ -1,0 +1,51 @@
+---
+title: |
+  High Returns, Low Investment: the Euler Equation Puzzle and Collective Action
+format:
+  aea-pdf:
+    keep-tex: true  
+    journal:
+      blinded: false
+    indent: true
+    citecolor: cyan
+    linkcolor: cyan
+    urlcolor: cyan
+  aea-html: default
+title-footnote: |
+  Some footnotes on the title...
+author-format: horizontal
+author:
+  - name: Yichu Li
+    acknowledgements: | 
+      The London School of Economics and Political Science. y.li395@lse.ac.uk.
+date: last-modified
+articleurl: https://hchulkim.github.io
+abstract: |
+  The text of your abstract.
+keywords:
+  - Euler Equation, Collective Action, Public Investment, Tax
+bibliography: bibliography.bib  
+---
+
+## Introduction {#sec-intro}
+
+I will show some examples of things you can easily do in quarto-format.Results
+
+## Conclusion {#sec-conc}
+
+## References {.unnumbered}
+
+::: {#refs}
+:::
+
+## Appendix {.supplementary}
+
+`{.supplementary}` works as an indicator that makes the section centered. Useful when starting an appendix or supplementary sections.
+
+### Appendix A {.unnumbered}
+
+Use `{.unnumbered}` to unnumber the section and give your own numbering.
+
+### Appendix B {.unnumbered}
+
+## Supplementary {.supplementary}
