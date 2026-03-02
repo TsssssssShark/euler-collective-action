@@ -51,5 +51,8 @@ rsconnect/
 # Data
 data/*.csv
 
+# bst
+*.bst
+
 /.quarto/
 **/*.quarto_ipynb
