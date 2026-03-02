@@ -1377,7 +1377,7 @@ FUNCTION {format.authors}
       if$
       extra.label.bysame "bysame" =
         { "\bysame " }
-        { bst.author.pre s remove.ss.period.auth * }
+        { bst.author.pre "\textbf{" * s remove.ss.period.auth * "}" * }
       if$
     }
   if$

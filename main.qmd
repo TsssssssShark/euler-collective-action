@@ -1,50 +1,50 @@
 ---
-title: |
-  High Returns, Low Investment: the Euler Equation Puzzle and Collective Action
+include-in-header:
+  text: |
+    \newcommand{\mytitle}{High Returns, Low Investment: \\ Public Capital and the Euler Equation Puzzle}
 format:
   aea-pdf:
     keep-tex: false  
     journal:
       blinded: false
     indent: true
-    citecolor: cyan
-    linkcolor: cyan
-    urlcolor: cyan
+    citecolor: red
+    linkcolor: red
+    urlcolor: red
   aea-html: default
 title-footnote: |
   Some footnotes on the title...
 author-format: horizontal
 author:
-  - name: Yichu Li
+  - name: "\\LARGE Yichu Li"
     acknowledgements: | 
-      The London School of Economics and Political Science. y.li395@lse.ac.uk.
+      The London School of Economics and Political Science. [y.li395@lse.ac.uk](mailto:y.li395@lse.ac.uk).
 date: last-modified
-articleurl: https://hchulkim.github.io
+articleurl: https://tsssssssshark.github.io/euler-collective-action/output/main.pdf
 abstract: |
   The text of your abstract.
 keywords:
   - Euler Equation, Collective Action, Public Investment, Tax
-bibliography: bibliography.bib  
+bibliography: references.bib
 ---
 
 ## Introduction {#sec-intro}
 
 I will show some examples of things you can easily do in quarto-format.Results
 
+## An Euler Equation Model with Public Capital Externalities {#sec-model}
+
+I build on the inter-temporal optimisation framework of @kremer2019
+
 ## Conclusion {#sec-conc}
 
 ## References {.unnumbered}
 
-::: {#refs}
-:::
+\newpage
 
 ## Appendix {.supplementary}
 
-`{.supplementary}` works as an indicator that makes the section centered. Useful when starting an appendix or supplementary sections.
-
-### Appendix A {.unnumbered}
-
-Use `{.unnumbered}` to unnumber the section and give your own numbering.
+### Appendix A: Data {.unnumbered}
 
 ### Appendix B {.unnumbered}
 
