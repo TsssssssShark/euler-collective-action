@@ -1,0 +1,4 @@
+project:
+  render:
+    - code/main.qmd
+  output-dir: output

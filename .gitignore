@@ -50,3 +50,6 @@ rsconnect/
 
 # Data
 data/*.csv
+
+/.quarto/
+**/*.quarto_ipynb
