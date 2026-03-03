@@ -12,8 +12,6 @@ format:
     linkcolor: red
     urlcolor: red
   aea-html: default
-title-footnote: |
-  Some footnotes on the title...
 author-format: horizontal
 author:
   - name: "\\LARGE Yichu Li"
@@ -24,9 +22,49 @@ articleurl: https://tsssssssshark.github.io/euler-collective-action/output/main.
 abstract: |
   The text of your abstract.
 keywords:
-  - Euler Equation, Collective Action, Public Investment, Tax
+  - Intertemporal Choice, Collective Action, Public Investment
 bibliography: references.bib
+execute:
+  echo: false
+  warning: false
+  message: false
+  cache: false
 ---
+
+```{r}
+#| label: setup-packages
+#| include: false
+
+# Check and install required packages
+required_packages <- c(
+  "tidyverse",
+  "kableExtra",
+  "here",
+  "glue",
+  "flextable",
+  "gt",
+  "ggplot2",
+  "haven",
+  "labelled"
+)
+
+missing_packages <- required_packages[
+  !required_packages %in% rownames(installed.packages())
+]
+
+if (length(missing_packages) > 0) {
+  message(
+    "Installing missing packages:",
+    paste(missing_packages, collapse = ", "),
+    "\n"
+  )
+  install.packages(missing_packages)
+}
+
+lapply(required_packages, library, character.only = TRUE)
+
+message("All packages loaded successfully!")
+```
 
 ## Introduction {#sec-intro}
 
@@ -34,18 +72,97 @@ I will show some examples of things you can easily do in quarto-format.Results
 
 ## An Euler Equation Model with Public Capital Externalities {#sec-model}
 
-I build on the inter-temporal optimisation framework of @kremer2019
+I build on the intertemporal optimisation framework of @kremer2019. I first consider the case where capital is entirely public and investment occurs only through taxation, showing that this generates a collective action problem that dilutes the effective return to capital. I then extend the standard model to incorporate both public and private capital, allowing households to allocate investments between the two.
 
-## Conclusion {#sec-conc}
+### Baseline: Standard Euler Equation
 
-## References {.unnumbered}
+Consider in a deterministic discrete-time intertemporal consumption model, households maximise their discounted lifetime utility over an infinite horizon.
+
+#### Optimisation Problem {.unnumbered}
+
+Households face the following optimisation problem:
+
+$$
+\max_{\{C_t\}} \sum_{t=0}^\infty \delta^t u(C_t)
+$$ {#eq-optimisation} where $0<\delta<1$ is the annual discount factor, $C_t$ is the household consumption in period $t$, and $u(C_t)$ measures the utility from consuming $C_t$ in period $t$. $u(C)$ is increasing and concave and follows Inada Conditions: $u'(C) > 0$, $u''(C) < 0$, $\lim_{C \to 0} u'(C) = \infty$, and $\lim_{C \to \infty} u'(C) = 0$.
+
+#### Budget Constraint {.unnumbered}
+
+$$
+x_{t+1} = f'(K_t)(x_t - C_t)
+$$ {#eq-budget}$x_t$ is household assets ('cash on hand') in period $t$ with $x_0$ given, $C_t$ is consumption in period $t$, and $f'(K_t)$ is the gross return to capital. $f(K)$ is increasing and concave, following: $f'(K) > 0$, $f''(K) < 0$, $\lim_{K \to 0} f'(K) = \infty$, and $\lim_{K \to \infty} f'(K) = 1$ (long-run steady state).
+
+#### Discrete Time Euler Equation {.unnumbered}
+
+Solving for optimal intertemporal consumption path:
+
+$$
+u'(C_t) = \delta f'(K_t) u'(C_{t+1})
+$$ {#eq-euler} Assume constant-elasticity-of-substitution (CES) utility:
+
+$$
+u(C) = 
+\begin{cases}
+    \frac{C^{1-\sigma}}{1-\sigma} & \text{if } \sigma \ne 1\\
+    \ln(C) & \text{if } \sigma = 1
+\end{cases}
+$$This means that the elasticity of intertemporal substitution is constant and independent of $C_t$. Therefore, the consumption growth rate is:
+
+$$
+\frac{C_{t+1}}{C_t} - 1 = (\delta f'(K_t))^{\frac{1}{\sigma}} - 1
+$$ {#eq-growth}
+
+#### The Puzzle in Low Income Countries {.unnumbered}
+
+Using $\delta = 0.96$ \footnote{$\frac{1}{\delta} - 1 \approx 0.04$, implying a 4\% annual rate of time preference.}and $\sigma = 2$ \footnote{Elasticity of intertemporal substitution of 0.5 is used in macro studies standard calibrations.} proposed in @kremer2019 as an example, and predicting $f'(K)$ using real internal rate of return, @fig-deviation shows that countries with higher predicted consumption growth rates tend to have actual consumption growth rates below the predicted rates.
+
+```{r}
+#| label: fig-deviation
+#| eval: true
+#| fig-cap: "Predicted vs. Actual Consumption Growth"
+
+# Read PWT dataset
+pwt <- read_dta(here("data", "pwt110", "pwt110.dta"))
+
+# Predicted vs. real consumption growth rate using only 'regular' irr
+pwt_dev <- pwt %>%
+  filter(i_irr == 0) %>%
+  mutate(
+    f_prime_k = 1 + irr,
+    g_predicted = (0.96 * f_prime_k)^(1/2) - 1,
+    cons_pc = rconna / pop
+  ) %>%
+  # Average
+  group_by(countrycode) %>%
+  arrange(year) %>%
+  mutate(g_actual = (cons_pc / lag(cons_pc)) - 1) %>%
+    summarise(
+      g_predicted = mean(g_predicted, na.rm = TRUE),
+      g_actual = mean(g_actual, na.rm = TRUE),
+      .groups = "drop"
+    )
+
+# Graph
+ggplot(pwt_dev, aes(x = g_predicted, y = g_actual)) +
+  geom_point(alpha = 0.5) +
+  geom_abline(slope = 1, intercept = 0, linetype = "dashed", color = "red") +
+  labs(
+    x = "Predicted Consumption Growth Rate",
+    y = "Actual Consumption Growth Rate"
+  ) +
+  theme_classic() +
+  theme(
+    plot.margin = margin(t = 5, r = 15, b = 5, l = 5),
+    panel.border = element_rect(colour = "black", fill = NA, linewidth = 0.5),
+    axis.ticks.length = unit(-0.15, "cm"),
+    axis.text.x = element_text(margin = margin(t = 0.3, unit = "cm")),
+    axis.text.y = element_text(margin = margin(r = 0.3, unit = "cm")),
+    plot.title = element_text(hjust = 0.5, face = "bold")
+  )
+```
+
+## Conclusion
 
 \newpage
 
-## Appendix {.supplementary}
-
-### Appendix A: Data {.unnumbered}
-
-### Appendix B {.unnumbered}
-
-## Supplementary {.supplementary}
+## References {.unnumbered}
