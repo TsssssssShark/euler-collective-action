@@ -45,7 +45,8 @@ required_packages <- c(
   "gt",
   "ggplot2",
   "haven",
-  "labelled"
+  "labelled",
+  "patchwork"
 )
 
 missing_packages <- required_packages[
@@ -74,7 +75,7 @@ I will show some examples of things you can easily do in quarto-format.Results
 
 I build on the intertemporal optimisation framework of @kremer2019. I first consider the case where capital is entirely public and investment occurs only through taxation, showing that this generates a collective action problem that dilutes the effective return to capital. I then extend the standard model to incorporate both public and private capital, allowing households to allocate investments between the two.
 
-### Baseline: Standard Euler Equation
+### Baseline: Standard Euler Equation {#sec-baseline}
 
 Consider in a deterministic discrete-time intertemporal consumption model, households maximise their discounted lifetime utility over an infinite horizon.
 
@@ -112,57 +113,132 @@ $$
 \frac{C_{t+1}}{C_t} - 1 = (\delta f'(K_t))^{\frac{1}{\sigma}} - 1
 $$ {#eq-growth}
 
-#### The Puzzle in Low Income Countries {.unnumbered}
+#### The Puzzle {.unnumbered}
 
-Using $\delta = 0.96$ \footnote{$\frac{1}{\delta} - 1 \approx 0.04$, implying a 4\% annual rate of time preference.}and $\sigma = 2$ \footnote{Elasticity of intertemporal substitution of 0.5 is used in macro studies standard calibrations.} proposed in @kremer2019 as an example, and predicting $f'(K)$ using real internal rate of return, @fig-deviation shows that countries with higher predicted consumption growth rates tend to have actual consumption growth rates below the predicted rates.
+To illustrate the puzzle, I use $\delta = 0.96$ \footnote{$\frac{1}{\delta} - 1 \approx 0.04$, implying a 4\% annual rate of time preference.}and $\sigma = 2$ \footnote{Elasticity of intertemporal substitution of 0.5 is used in macro studies standard calibrations.} proposed in @kremer2019, and lagged internal rates of return from the Penn World Table (PWT) \footnote{Available for download at \url{www.ggdc.net/pwt}} [@feenstra2015] as a proxies for $f'(K)$ to model the predicted consumption growth rates under @eq-growth. Intuitively, a concave production function means that countries with lower capital stock face higher returns on capital investment. @fig-k-gdp shows that countries with lower income have lower capital stock. Therefore, from @eq-growth, consumption growth rates should be high. However, @fig-actual-predict Panel (A) shows that in many middle- and low-income countries, the actual growth rates fall below what the Euler Equation predicts. Moreover, @fig-actual-predict Panel (B) shows that countries with higher predicted consumption growth rates tend to have larger gap between predicted and actual consumption growth rates. This pattern is most pronounced in countries such as Egypt, Venezuela, Côte d'Ivoire, and Zimbabwe. The puzzle, therefore, is why households in these economies invest at levels far below what the standard model predicts as optimal.
 
 ```{r}
-#| label: fig-deviation
-#| eval: true
-#| fig-cap: "Predicted vs. Actual Consumption Growth"
+#| label: read-pwt
 
 # Read PWT dataset
 pwt <- read_dta(here("data", "pwt110", "pwt110.dta"))
+```
 
-# Predicted vs. real consumption growth rate using only 'regular' irr
-pwt_dev <- pwt %>%
-  filter(i_irr == 0) %>%
+```{r}
+#| label: fig-k-gdp
+#| fig-cap: "Capital Stock and Income Across Countries 1950-2023"
+#| fig-cap-location: top
+
+pwt %>%
+  filter(!is.na(rgdpe), !is.na(rkna), !is.na(pop), pop >= 1) %>%
   mutate(
-    f_prime_k = 1 + irr,
-    g_predicted = (0.96 * f_prime_k)^(1/2) - 1,
-    cons_pc = rconna / pop
+    gdp_pc = rgdpe / pop,
+    capital_pc = cn / pop
   ) %>%
-  # Average
-  group_by(countrycode) %>%
-  arrange(year) %>%
-  mutate(g_actual = (cons_pc / lag(cons_pc)) - 1) %>%
-    summarise(
-      g_predicted = mean(g_predicted, na.rm = TRUE),
-      g_actual = mean(g_actual, na.rm = TRUE),
-      .groups = "drop"
-    )
-
-# Graph
-ggplot(pwt_dev, aes(x = g_predicted, y = g_actual)) +
-  geom_point(alpha = 0.5) +
-  geom_abline(slope = 1, intercept = 0, linetype = "dashed", color = "red") +
+  ggplot(aes(x = log(gdp_pc), y = log(capital_pc))) +
+  geom_point(alpha = 0.1, size = 0.5) +
   labs(
-    x = "Predicted Consumption Growth Rate",
-    y = "Actual Consumption Growth Rate"
+    x = "Log GDP per Capita (PPP)",
+    y = "Log Capital Stock per Capita",
+    caption = stringr::str_wrap("Notes: Capital stock at current PPPs.Expenditure-side real GDP at chained PPPs. Source: PWT 11.0.", width = 100)
   ) +
   theme_classic() +
   theme(
+    plot.caption = element_text(hjust = 0, size = 8, face = "italic"),
+    plot.caption.position = "plot",
     plot.margin = margin(t = 5, r = 15, b = 5, l = 5),
     panel.border = element_rect(colour = "black", fill = NA, linewidth = 0.5),
     axis.ticks.length = unit(-0.15, "cm"),
     axis.text.x = element_text(margin = margin(t = 0.3, unit = "cm")),
-    axis.text.y = element_text(margin = margin(r = 0.3, unit = "cm")),
-    plot.title = element_text(hjust = 0.5, face = "bold")
+    axis.text.y = element_text(margin = margin(r = 0.3, unit = "cm"))
   )
 ```
 
-## Conclusion
+```{r}
+#| label: fig-actual-predict
+#| eval: true
+#| fig-cap: "Actual vs. Predicted Average Consumption Growth Across Countries 2010-2019"
+#| fig-cap-location: top
+#| fig-width: 6
+#| fig-height: 7
 
-\newpage
+# Predicted vs. real consumption growth rate using only 'regular' irr
+
+# Define and later remove small countries by population
+small_countries <- pwt %>%
+  filter(year == 2019) %>%
+  filter(pop < 1) %>% 
+  pull(countrycode)
+
+pwt_dev <- pwt %>%
+  filter(i_irr == 0, year >= 2009, year <= 2019, !countrycode %in% small_countries) %>%
+  
+  group_by(countrycode) %>%
+  arrange(year) %>%
+  
+  mutate(
+    f_prime_k = 1 + lag(irr),
+    g_predicted = (0.96 * f_prime_k)^(1/2) - 1,
+    cons_pc = rconna / pop
+  ) %>%
+  # Average
+  mutate(g_actual = (cons_pc / lag(cons_pc)) - 1) %>%
+  filter(year >= 2010, !is.na(g_predicted), !is.na(g_actual)) %>%
+    summarise(
+      g_predicted = mean(g_predicted, na.rm = TRUE),
+      g_actual = mean(g_actual, na.rm = TRUE),
+      .groups = "drop"
+    ) %>%
+  mutate(gap = g_predicted - g_actual)
+
+# Graph
+a <- ggplot(pwt_dev, aes(x = g_predicted, y = g_actual)) +
+        geom_point(alpha = 0.5) +
+        geom_abline(slope = 1, intercept = 0, linetype = "dashed", color = "blue") +
+        labs(
+          x = "Predicted Consumption Growth Rate",
+          y = "Actual Consumption Growth Rate",
+          title = "(A)",
+          caption = stringr::str_wrap("Notes: The dashed line is the 45 degree line. Countries with populations below 1 million and irregular internal rates of return excluded. Data after 2019 is excluded to avoid Covid-19 distortions. Source: PWT 11.0.", width = 100)
+        ) +
+        theme_classic() +
+        theme(
+          plot.caption = element_text(hjust = 0, size = 8, face = "italic"),
+          plot.caption.position = "plot",
+          plot.margin = margin(t = 5, r = 15, b = 5, l = 5),
+          panel.border = element_rect(colour = "black", fill = NA, linewidth = 0.5),
+          axis.ticks.length = unit(-0.15, "cm"),
+          axis.text.x = element_text(margin = margin(t = 0.3, unit = "cm")),
+          axis.text.y = element_text(margin = margin(r = 0.3, unit = "cm")),
+          plot.title = element_text(hjust = 0.5)
+      )
+
+b <- ggplot(pwt_dev, aes(x = g_predicted, y = gap)) +
+       geom_point(alpha = 0.5) +
+       geom_smooth(method = "lm", color = "red", se = FALSE) +
+       labs(
+         x = "Predicted Consumption Growth Rate",
+         y = "Predicted - Actual Growth Rate",
+         title = "(B)",
+         caption = stringr::str_wrap("Notes: The red line is OLS fit. Source: PWT 11.0.",
+                                      width = 100)
+       ) +
+       theme_classic() +
+       theme(
+         panel.border = element_rect(colour = "black", fill = NA, linewidth = 0.5),
+         axis.ticks.length = unit(-0.15, "cm"),
+         axis.text.x = element_text(margin = margin(t = 0.3, unit = "cm")),
+         axis.text.y = element_text(margin = margin(r = 0.3, unit = "cm")),
+         plot.caption = element_text(hjust = 0, size = 8, face = "italic"),
+         plot.caption.position = "plot",
+         plot.title = element_text(hjust = 0.5)
+       )
+
+a / b
+```
+
+### Capital as a Public Good {#sec-capital-public}
+
+\clearpage
 
 ## References {.unnumbered}
