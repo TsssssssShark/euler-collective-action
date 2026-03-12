@@ -7,7 +7,7 @@ include-in-header:
     \setlength{\parindent}{2em}
 format:
   aea-pdf:
-    keep-tex: true  
+    keep-tex: false  
     journal:
       blinded: false
     indent: true
@@ -78,7 +78,7 @@ INSERT INTRODUCTION
 
 ## An Euler Equation Model Incorporating Public Capitals {#sec-model}
 
-I build on the intertemporal optimisation framework of @kremer2019. I first consider the case where capital is entirely public and investment occurs only through taxation, showing that this generates a collective action problem and a government efficiency problem that dilutes the effective return to capital when state taxation capacity and efficiency is low. I then extend this analysis into a generalised model standard model incorporating both public and private capital, allowing households to allocate investments between the two.
+I build on the intertemporal optimisation framework of @kremer2019. I first recall the model setup and present the Euler Equation Puzzle through the model. I then consider the extreme scenario where only public capitals exist and investment occurs only through taxation, showing that this generates a collective action problem and a government efficiency problem that dilutes the effective return to capital when state taxation capacity and efficiency is low. Finally, I will extend this analysis into a generalised model incorporating both public and private capital, allowing households to allocate investments between the two.
 
 ### Baseline: Standard Euler Equation {#sec-baseline}
 
@@ -112,7 +112,7 @@ $$ {#eq-growth}
 
 #### The Puzzle {.unnumbered}
 
-Assume that the model governs the intertemporal consumption behaviour of a representative household, the model should also apply at a macro level. To illustrate the puzzle at the macro level, I use $\delta = 0.96$ \footnote{$\frac{1}{\delta} - 1 \approx 0.04$, implying a 4\% annual rate of time preference.}and $\sigma = 2$ \footnote{Elasticity of intertemporal substitution of 0.5 is used in macro studies standard calibrations.} proposed in @kremer2019, and internal rates of return from the Penn World Table (PWT) \footnote{Available for download at \url{www.ggdc.net/pwt}} [@feenstra2015a] as a proxy for $f'(K)$\footnote{See \url{https://www.rug.nl/ggdc/docs/the_next_generation_of_the_penn_world_table.pdf}} to model the predicted consumption growth rates under @eq-growth. Intuitively, a concave production function means that countries with lower capital stock face higher returns on capital investment. @fig-k-gdp shows that countries with lower income have lower capital stock. Therefore, according to @eq-growth, consumption growth rates should be high. However, @fig-actual-predict Panel (A) shows that in many middle- and low-income countries, the actual growth rates fall below what the Euler Equation predicts. Moreover, @fig-actual-predict Panel (B) shows that countries with higher predicted consumption growth rates tend to have larger gap between predicted and actual rates. This pattern is most pronounced in countries such as Egypt, Venezuela, Côte d'Ivoire, and Zimbabwe. Therefore, the puzzle is why households in these economies invest at levels far below what the standard model predicts as optimal.
+Assume that the model governs the intertemporal consumption behaviour of a representative household, the model should also apply at the macro level. To illustrate the puzzle with macro-level data, I use $\delta = 0.96$ \footnote{$\frac{1}{\delta} - 1 \approx 0.04$, implying a 4\% annual rate of time preference.}and $\sigma = 2$ \footnote{Elasticity of intertemporal substitution of 0.5 is used in macro studies standard calibrations.} proposed in @kremer2019, and internal rates of return from the Penn World Table (PWT) \footnote{Available for download at \url{www.ggdc.net/pwt}} [@feenstra2015a] as a proxy for $f'(K)$\footnote{See \url{https://www.rug.nl/ggdc/docs/the_next_generation_of_the_penn_world_table.pdf}} to model the predicted consumption growth rates under @eq-growth. Intuitively, a concave production function means that countries with lower capital stock face higher returns on capital investment. @fig-k-gdp shows that countries with lower income have lower capital stock. Therefore, according to @eq-growth, consumption growth rates should be high. However, @fig-actual-predict Panel (A) shows that in many middle- and low-income countries, the actual growth rates fall below the model predictions. Moreover, @fig-actual-predict Panel (B) shows that countries with higher predicted consumption growth rates tend to have larger gap between predicted and actual rates. This pattern is most pronounced in countries such as Egypt, Venezuela, Côte d'Ivoire, and Zimbabwe. Therefore, the puzzle is why households in these economies invest at levels far below what the standard model predicts as optimal.
 
 ```{r}
 #| label: read-pwt
@@ -235,11 +235,11 @@ a1 / b1
 
 ### Capital as a Public Good {#sec-capital-public}
 
-The baseline model in @sec-baseline assumes capital investments are private for households. This means that households receive the full returns $f'(K)$ because they would own the invested capital in productions. These are scenarios where farmers invest in agricultural tools, vendors invest in mobile phones to gather market information, or freelance drivers invest in a motorcycle or car. However, capitals with public good features like infrastructure often require public investment commonly through government spending, and the benefits from these investments are shared among the population. INSERT EXAMPLES OF HIGH RETURNS. Since taxes commonly fund the majority of government spending, households engage with public investment indirectly through paying taxes. This structure can create a collective action problem and a government inefficiency problem that produces low levels of public investments despite high rates of return.
+The baseline model in @sec-baseline assumes capital investments are private for households. This means that households receive the full returns $f'(K)$ because they would own the invested capital in productions. These are scenarios where farmers invest in agricultural tools, vendors invest in mobile phones to gather market information, or freelance drivers invest in a motorcycle or car. However, capitals with public good features like infrastructure often require public investment commonly through government spending, and the benefits from these investments are shared among the population. @aschauer1989 estimates a high average elasticity of 0.39 between output and public investment in the United States over 1949-1985, while @bom2014 proposes a more modest estimate of 0.106. The latter estimate that the short-run national-level elasticity of 0.083 still imply a 16% marginal return to public capital in OECD countries. The returns are likely higher in regional levels and much higher in lower-income countries with lower public capital stocks. However, since taxes commonly fund the majority of government spending, households engage with public investment indirectly through paying taxes. This structure can create a collective action problem and a government inefficiency problem that produces low levels of public investments despite high rates of return.
 
-To illustrate this, I will present an extreme case where we assume capitals are all publicly invested through taxation by governments. Consider the same optimisation problem as @eq-optimisation with a different budget constraint for homogeneous households in an economy. For any household $i$, the budget constraint is: $$
+To illustrate, I will present an extreme case where we assume capitals are all publicly invested through taxation by governments. Consider the same optimisation problem as @eq-optimisation with a different budget constraint for homogeneous households in an economy. For any household $i$, the budget constraint is: $$
 x_{i,t+1} = \frac{1}{N} \cdot \gamma f'(K_t) \cdot [(x_{i,t} - C_{i,t}) + \sum_{\forall j \neq i} (x_{j,t} - C_{j, t})]\
-$$ {#eq-budget-public} where $N$ is the total number of households in the economy, $\sum_{\forall j \neq i} (x_{j,t} - C_{j, t})$ is the aggregate public investment from all other households, and $\gamma \in [0,1]$ represents government efficiency. Because public capitals can only be invested collectively, the total returns depend on the aggregate investment level, and assume each individual household receive an equal share of the total returns. Assume the government's only fiscal spending is on public capital investment, $\gamma=0$ when the government effectively invests no tax revenue into public captials and $\gamma = 1$ when the government effectively invests all of tax revenues into public capitals.
+$$ {#eq-budget-public} where $N$ is the total number of households in the economy, $\sum_{\forall j \neq i} (x_{j,t} - C_{j, t})$ is the aggregate public investment from all other households, and $\gamma \in [0,1]$ represents government efficiency. Because public capitals can only be invested collectively, the total returns depend on the aggregate investment level, and assume each individual household receive an equal share of the total returns. Assume the government's only fiscal spending is on public capital investment, $\gamma=0$ when the government effectively invests no tax revenue into public capitals and $\gamma = 1$ when the government effectively invests all of tax revenues into public capitals.
 
 #### Weak Taxation Capacity and Government Efficiency {.unnumbered}
 
@@ -249,7 +249,7 @@ Solving for optimal intertemporal consumption path for household $i$ given $\sum
 u'(C_{i,t}) = \frac{1}{N} \cdot \delta \gamma f'(K_t) u'(C_{i, t+1})
 $$ {#eq-euler-public} Notice that when $N=1$ and $\gamma = 1$, this equation is identical to @eq-euler, but $u'(C_{i.t})$ decreases as $N$ becomes larger and $\gamma$ becomes smaller. For increasing and concave utility function, $u'(C_{i,t})$ is smaller when $C_{i,t}$ is larger. This means that household $i$ will consume more and invest less as $N$ increases and $\gamma$ decreases. For sufficiently large $N$ or sufficently small $\gamma$ so that the Euler Equation cannot be satisfied by an interior solution, household $i$ will optimally choose a corner solution of consuming all and invest none. $\frac{1}{N}$ produces a collective action problem where the global optimal decision is for all households to invest and benefit from high $f'(K)$ but individuals households have a dominant strategy of not investing. $\gamma$ produces a problem where fiscal leakages to corruption or misallocation disincentives the household to invest.
 
-This model captures the reluctant tax compliance in many low- or middle-income countries where the population is sufficiently large and the states have weaker taxation capacity and relatively inefficient. @fig-tax-gove-gdp shows these model assumptions are consistent with the data.
+This model captures the reluctant tax compliance in many low- or middle-income countries where the states have weaker taxation capacity and are relatively inefficient. @fig-tax-gove-gdp also shows the model assumptions are consistent with the data.
 
 ```{r}
 #| label: data-tax
@@ -358,35 +358,35 @@ a2/b2
 
 Higher income countries tend to have more efficient governments and stronger taxation capacity because income tax can be more easily collected from formal employees. Although, public investment is less voluntary for tax rates as given, households might make public investment decisions by influencing the tax rates through political channels. The key difference is that they expect other households to also comply with the decided upon tax rates.
 
-Consider a simple case of homogeneous households facing the same optimisation problem as @eq-optimisation bu assume perfect enforcibility upon any chosen taxation level instead and perfect government efficiency. Any individual household $i$ chooses a taxation level (public investment level) $(x_{i,t} - C_{it})$ and expect symmetry from other households. Because households are homogeneous, the following should hold: $$
+Consider a simple case of homogeneous households facing the same optimisation problem as @eq-optimisation but assume instead perfect enforcability upon any chosen taxation level and perfect government efficiency. Any individual household $i$ chooses a taxation level (public investment level) $(x_{i,t} - C_{it})$ and expect symmetry from other households. Because households are homogeneous, the following should hold: $$
 [(x_{i,t} - C_{i,t}) + \sum_{\forall j \neq i} (x_{j,t} - C_{j, t})] = N \cdot (x_{i,t} - C_{i,t})
-$$Therefore, the budget constraint becomes identical to @eq-budget: $$
+$$Since perfect government efficiency implies $\gamma = 1$, the budget constraint becomes identical to @eq-budget: $$
 x_{i,t+1} = \frac{1}{N} \cdot 1 \cdot f'(K_t)\cdot N \cdot (x_{i,t} - C_{i,t}) = f'(K_t)(x_{i,t} - C_{i,t})
 $$ Solving for optimal consumption path will produce an Euler Equation identical to @eq-euler. Note that the collective action problem is resolved in this setting because the perfect tax enforcement enables households to optimise consumption conditional on the expectation of symmetrical behaviours from others.
 
 ### A Generalised Model {.unnumbered}
 
-In reality, the majority of countries likely fall in between the extreme cases outlined in @sec-capital-public. Within a country, there are likely different extents that households pay taxes, based on formal or self-employment for example. Therefore, on a macro level, it depends on whether the collective action problem dominates.
-
-To generalise the model of public investment, I propose the following budget constraint: $$
+In reality, the majority of countries likely fall in between the extreme cases outlined in @sec-capital-public. To generalise the model of public investment, I propose the following budget constraint: $$
 x_{t+1} = \frac{1}{N^\lambda} \cdot \gamma f'(K_t^{pub})(x_t - C_t)
 $$where $K_t^{pub}$ is the public capital stock and $\lambda$ is a parameter between 0 and 1 that determines the salience of the collective action problem in public investment. $\lambda = 1$ if the collective action problem is most extreme and $\lambda = 0$ if there is no collective action problem. Combining this model with the baseline private capital investment budget constraint gives: $$
 x_{t+1} = r_t^{eff} \cdot (x_t - C_t)
 $$ {#eq-budget-combined} where $$
-r_t^{eff} = (1-PublicShare_t) \cdot f'(K^{priv}_t) + PublicShare_t \cdot \gamma f'(K^{pub}_t)
-$$ $K^{priv}$ denoting private capital stock and $PublicShare$ denoting the share of public capital investment in total investment. The returns on private and public capital are derived by this generalised production function: $$
+r_t^{eff} = (1-PublicShare_t) \cdot f'(K^{priv}_t) + PublicShare_t \cdot \frac{1}{N^{\lambda}} \cdot \gamma f'(K^{pub}_t)
+$$ with $K^{priv}$ denoting private capital stock and $PublicShare$ denoting the share of public capital investment in total investment. EXCLUDE:The returns on private and public capitals are derived by this generalised production function facing a representative household in the economy: $$
 Y_t = A_t(K_t^{priv})^{\alpha^{priv}}(K_t^{pub})^{\alpha^{pub}}L^{1-\alpha^{priv}-\alpha^{pub}}
 $$ where the FOCs are: $$
 f'(K_t^{priv}) = \alpha_{priv} \cdot \frac{Y_t}{K_t^{priv}} \quad \text{and} \quad f'(K_t^{pub}) = \alpha_{pub} \cdot \frac{Y_t}{K_t^{pub}}
 $$ {#eq-returns} Taken all together, solving for optimal consumption path under constraint given by @eq-budget-combined produces an Euler Equation: $$
 u'(C_t) = \delta \cdot r^{eff} \cdot u'(C_{t+1})
-$$ {#eq-euler-combined} and consumption growth rate given by:
+$$ {#eq-euler-combined} and the consumption growth rate is given by:
 
 $$
 \frac{C_{t+1}}{C_t} - 1 = (\delta \cdot r^{eff})^{\frac{1}{\sigma}} - 1
 $$ {#eq-growth-combined}
 
 ## Stylised Facts
+
+A causal inference is outside the scope of this paper. However, in this section, I will highlight some stylised facts from data and literature on the relevant causal channels in support.
 
 ```{r}
 #| label: read-icsd
@@ -453,6 +453,8 @@ icsd_invest <- icsd %>%
   group_by(iso3c) %>%
   mutate(igov_pc = igov / pop)
 ```
+
+## Roles of Collective Action and Government Efficiency in Development Accounting
 
 \clearpage
 
