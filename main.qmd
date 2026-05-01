@@ -14,6 +14,7 @@ format:
     citecolor: red
     linkcolor: red
     urlcolor: red
+    reference-location: section
   aea-html: default
 author-format: horizontal
 author:
@@ -52,7 +53,9 @@ required_packages <- c(
   "patchwork",
   "countrycode",
   "fixest",
-  "modelsummary"
+  "modelsummary",
+  "diptest",
+  "plm"
 )
 
 missing_packages <- required_packages[
@@ -77,15 +80,13 @@ message("All packages loaded successfully!")
 
 Much of development economics research attempt to understand what is holding back economic development in lower- and middle-income countries. The categorisation of countries into 'developing' versus 'developed' implies that the former have higher development potentials. The @solow1956 growth model predicts exactly this pattern because poorer economies with smaller capital stocks should face higher marginal returns to capital investment and therefore grow faster than richer economies. While the broad pattern of higher GDP growth rates in lower-income countries over the past four decades is consistent with this prediction, many countries have still believed to been growing at rates below their potentials.
 
-@lucas1990 and @caselli2007 points out that the higher marginal product of capital in lower-income countries is often balanced-off by their lower endowment in complimentary factors like human capital, or lower total factor productivity. This provides an aggregate-level explanation for why capitals do not flow from higher-income to lower-income countries as much as expected. However, the puzzle is not fully addressed because on the aggregate-level, it does not explain why lower-income countries do not invest in human capital or R&D to benefit from the high capital returns. Moreover, through micro-level RCTs, @demel2008 show that microenterprises in Sri Lanka face 4.6%-5.3% real returns to capital, and @balboni2022 show significant long-run returns on agricultural capitals sufficient to push households in Bangladesh out of a poverty trap. @kremer2019 uses an household-level intertemporal constrained optimisation model to illustrate an '*Euler Equation Puzzle*' where people in lower-income settings invest sub-optimally given high returns from capital investment.
+@lucas1990 and @caselli2007 points out that the higher marginal product of capital in lower-income countries is often balanced-off by their lower endowment in complimentary factors like human capital, or lower total factor productivity. This provides an aggregate-level explanation for why capitals do not flow from higher-income to lower-income countries as much as expected. However, the puzzle is not fully addressed because on the aggregate-level, it does not explain why lower-income countries do not invest in human capital or R&D to benefit from the high capital returns. Moreover, through micro-level RCTs, @demel2008 show that microenterprises in Sri Lanka face 55%-63% real anual returns to capital, and @balboni2022 show significant long-run returns on agricultural capitals sufficient to push households in Bangladesh out of a poverty trap. @kremer2019 uses an household-level intertemporal constrained optimisation model to illustrate an '*Euler Equation Puzzle*' where people in lower-income settings should experience a 20% consumption growth rate facing a 150% gross return, but the actual consumption growth rates are much lower.
 
-Relating to this paradox, a large body of literature including @balboni2022 and research covered in @banerjee2003 point to liquidity and credit constraints facing households and firms; some including @acemoglu2001, @mauro1995 and @banerjee2002 point to institutional ineffectiveness and insufficient property rights protections; while @kremer2019 point to studies in behavioural channels such as present bias. However, the existing literature focus primarily on private investment channels. For example, these are scenarios where farmers investing in a cattle or fertilisers and benefit fully from the output gains. Meanwhile, returns on certain capitals like infrastructure or human capital are also high in lower-income countries. Investment in public capitals often require fiscal spending from the government funded primarily by tax revenues. @besley2013 show that in lower-income countries taxation is more difficult administratively while frictions against efficient spending are stronger.
+Relating to this paradox, a large body of literature including @balboni2022 and research covered in @banerjee2003 point to liquidity and credit constraints facing households and firms; some including @acemoglu2001, @mauro1995 and @banerjee2002 point to institutional ineffectiveness and insufficient property rights protections; while @kremer2019 point to studies in behavioural channels such as present bias. However, the existing literature focus primarily on private investment channels. For example, these are scenarios where farmers investing in a cattle or fertilisers and benefit fully from the output gains. Meanwhile, returns on certain capitals like infrastructure or human capital are also high in lower-income countries. Investment in public capitals often require fiscal spending from the government funded primarily by tax revenues. @besley2013 show that in lower-income countries taxation is more difficult administratively while frictions against efficient spending are stronger. The constraints on both private and public capital investment seem to be likely correlated with the existing capital accumulation and development levels, hinting towards an endogenous capital investment mechanism that relate to the poverty trap and convergence literature. Studies like @balboni2022 shows that poverty traps likely bind the ultra-poor households to invest, while research on aggregate growth like @quah1996 documents the bimodal pattern and @aghion2005 identifies the role of financial development in threshold convergence.
 
-Nonetheless, it might still seem irrational for above-subsistence households in lower-income countries to avoid taxes even with low expected penalties because the long-term returns from public capitals can be sufficiently high. This paper shows that the set-up of the taxation-to-government-spending mechanism can produce a collective action problem at the household level when perceived state taxation capacity is low.
+Nonetheless, @kremer2019 questions why households would not rationally attempt more to smooth consumption or leverage on informal credits when motivated by the high returns. The poverty traps thresholds are likely less binding for the non-ultra-poor, but they systematically not exploit the capital returns sufficiently either. The same question extends to the public capital investment: it seems irrational for above-subsistence households in lower-income countries to avoid taxes even with low expected penalties because the long-term returns from public capitals can be sufficiently high. This paper adapts and develop on the baseline mode of @kremer2019 to show that the set-up of the taxation-to-government-spending mechanism produces a collective action problem at the household level. Public capital investment requires highly lumpy fiscal spending funded by taxation, and the total returns are shared by each household like public goods. When the perceived state taxation capacity is low, households expect low actual returns on public capital investment via taxation because they cannot credibly expect others to pay taxes symmetrically. Therefore, for sufficiently low state taxation capacity, households' dominant strategy is to consume all and pay zero taxes.
 
-In @sec-model of this paper, I will illustrate the collective action problem on public capital investment base on the intertemporal constrained optimisation model of @kremer2019.
-
-## A Household Intertemporal Constrained Optimisation Model Incorporating Public Capitals {#sec-model}
+## A Household Intertemporal Constrained Optimisation Model on Capital Investment {#sec-model}
 
 I build on the intertemporal optimisation framework of @kremer2019. I first recall the model setup and present the Euler Equation Puzzle through the model. I then consider the extreme scenario where only public capitals exist and investment occurs only through taxation, showing that this generates a collective action problem and a government efficiency problem that dilutes the effective return to capital when state taxation capacity and efficiency is low. Finally, I will extend this analysis into a generalised model incorporating both private and public capital, allowing households to allocate investments between the two.
 
@@ -95,33 +96,25 @@ Consider in a deterministic discrete-time intertemporal consumption model, house
 
 #### Optimisation Problem {.unnumbered}
 
-Households face the following optimisation problem:$$
-\max_{\{C_t\}} \sum_{t=0}^\infty \delta^t u(C_t),
-$$ {#eq-optimisation} where $0<\delta<1$ is the annual discount factor, $C_t$ is the household consumption in period $t$, and $u(C_t)$ measures the utility from consuming $C_t$ in period $t$. $u(C)$ is increasing and concave and follows Inada Conditions: $u'(C) > 0$, $u''(C) < 0$, $\lim_{C \to 0} u'(C) = \infty$, and $\lim_{C \to \infty} u'(C) = 0$.
+Households face the following optimisation problem: $$\max_{\{C_t\}} \sum_{t=0}^\infty \delta^t u(C_t),$$ {#eq-optimisation} where $0<\delta<1$ is the annual discount factor, $C_t$ is the household consumption in period $t$, and $u(C_t)$ measures the utility from consuming $C_t$ in period $t$. $u(C)$ is increasing and concave and follows Inada Conditions: $u'(C) > 0$, $u''(C) < 0$, $\lim_{C \to 0} u'(C) = \infty$, and $\lim_{C \to \infty} u'(C) = 0$.
 
 #### Budget Constraint {.unnumbered}
 
-$$
-x_{t+1} = f'(K_t)(x_t - C_t)
-$$ {#eq-budget}$x_t$ is household assets ('cash on hand') in period $t$ with $x_0$ given, $C_t$ is consumption in period $t$, and $f'(K_t)$ is the gross return to capital. $f(K)$ is increasing and concave, following: $f'(K) > 0$, $f''(K) < 0$, $\lim_{K \to 0} f'(K) = \infty$, and $\lim_{K \to \infty} f'(K) = 1$ (long-run steady state).
+While the model set-up in @kremer2019 consider the gross return to capital, I consider the return to capital which allows me to model capital depreciation that the PWT data provides at the aggregate level. Therefore, the budget constraint is:
+
+$$x_{t+1} = [(1-d) + f'(K_t)](x_t - C_t),$$ {#eq-budget} $x_t$ is household assets ('cash on hand') in period $t$ with $x_0$ given, $C_t$ is consumption in period $t$, and $f'(K_t)$ is the return to capital, and $d$ is the capital depreciation rate. $f(K)$ is increasing and sconcave, following: $f'(K) > 0$, $f''(K) < 0$, $\lim_{K \to 0} f'(K) = \infty$, and $\lim_{K \to \infty} f'(K) = 0$ (long-run steady state).
 
 #### Discrete Time Euler Equation {.unnumbered}
 
-Solve for optimal intertemporal consumption path:$$
-u'(C_t) = \delta f'(K_t) u'(C_{t+1}),
-$$ {#eq-euler} and assume constant-elasticity-of-substitution (CES) utility:$$
-u(C) = 
+Solve for optimal intertemporal consumption path: $$u'(C_t) = \delta \cdot [(1-d) + f'(K_t)] \cdot u'(C_{t+1}),$$ {#eq-euler} and assume constant-elasticity-of-substitution (CES) utility: $$u(C) = 
 \begin{cases}
     \frac{C^{1-\sigma}}{1-\sigma} & \text{if } \sigma \ne 1\\
     \ln(C) & \text{if } \sigma = 1
-\end{cases}
-$$ so that the elasticity of intertemporal substitution is constant and independent of $C_t$. This gives the consumption growth rate:$$
-\frac{C_{t+1}}{C_t} - 1 = (\delta f'(K_t))^{\frac{1}{\sigma}} - 1,
-$$ {#eq-growth} where $\frac{1}{\sigma}$ is the elasticity of intertemporal substitution.
+\end{cases}$$ so that the elasticity of intertemporal substitution is constant and independent of $C_t$. This gives the consumption growth rate: $$\frac{C_{t+1}}{C_t} - 1 = (\delta [(1-d) + f'(K_t)])^{\frac{1}{\sigma}} - 1,$$ {#eq-growth} where $\frac{1}{\sigma}$ is the elasticity of intertemporal substitution.
 
 #### The Puzzle {.unnumbered}
 
-Assume that the model governs the intertemporal consumption behaviour of a representative household, the model should also apply at the macro level. To illustrate the puzzle with macro-level data, I use $\delta = 0.96$ \footnote{$\frac{1}{\delta} - 1 \approx 0.04$, implying a 4\% annual rate of time preference.}and $\sigma = 2$ \footnote{Elasticity of intertemporal substitution of 0.5.} proposed in @kremer2019, and internal rates of return (IRR) from PWT \footnote{Available for download at \url{www.ggdc.net/pwt}} [@feenstra2015a] as a proxy for $f'(K)$\footnote{See \url{https://www.rug.nl/ggdc/docs/the_next_generation_of_the_penn_world_table.pdf}} to model the predicted consumption growth rates under @eq-growth. Intuitively, a concave production function means that countries with lower capital stock face higher returns on capital investment. @fig-k-gdp shows that countries with lower income have lower capital stock. Therefore, according to @eq-growth, consumption growth rates should be high. However, @fig-actual-predict Panel (A) shows that in many countries, the actual growth rates is insensitive to IRR and many fall below the model predictions. Moreover, @fig-actual-predict Panel (B) shows a perplex trend where countries with higher predicted consumption growth rates tend to have larger gap between predicted and actual rates. This pattern is most pronounced in countries such as Egypt, Venezuela, Côte d'Ivoire, and Zimbabwe. Therefore, the core of the puzzle are why households in these economies invest at levels far below what the standard model predicts as optimal, and why is this pattern more pronounced in countries where returns on capitals are high.
+Assume that the model governs the intertemporal consumption behaviour of a representative household, the model should also apply at the macro level. To illustrate the puzzle with macro-level data, I use $\delta = 0.96$ \footnote{$\frac{1}{\delta} - 1 \approx 0.04$, implying a 4\% annual rate of time preference.}and $\sigma = 2$ \footnote{Elasticity of intertemporal substitution of 0.5.} proposed in @kremer2019, and internal rates of return (IRR) from PWT \footnote{Available for download at \url{www.ggdc.net/pwt}} [@feenstra2015a] as a proxy for $f'(K)$\footnote{See \url{https://www.rug.nl/ggdc/docs/the_next_generation_of_the_penn_world_table.pdf}} to model the predicted consumption growth rates under @eq-growth. Intuitively, a concave production function means that countries with lower capital stock face higher returns on capital investment. @fig-k-gdp shows that countries with lower income have lower capital stock which is expected because the @solow1956 model shows that output increases with capital accumulation. Therefore, according to @eq-growth, consumption growth rates should be high in lower-income countries. However, @fig-actual-predict Panel (A) shows that in many countries, the actual growth rates is insensitive to IRR and many fall below the model predictions. Moreover, @fig-actual-predict Panel (B) shows a perplex trend where countries with higher predicted consumption growth rates tend to have larger gap between predicted and actual rates. This pattern is most pronounced in countries lower-middle and low income countries. Therefore, the core of the puzzle are why households in these economies invest at levels far below what the standard model predicts as optimal, and why is this pattern more pronounced in countries where returns on capitals are high.
 
 ```{r}
 #| label: read-pwt
@@ -179,10 +172,10 @@ pwt_dev <- pwt %>%
   group_by(countrycode) %>%
   arrange(year) %>%
   mutate(
-    f_prime_k = 1 + lag(irr),
-    g_predicted = (0.96 * f_prime_k)^(1/2) - 1,
+    f_prime_k = dplyr::lag(irr),
+    g_predicted = (0.96 * ((1-delta) + f_prime_k))^(1/2) - 1,
     cons_pc = rconna / pop,
-    g_actual = (cons_pc / lag(cons_pc)) - 1
+    g_actual = (cons_pc / dplyr::lag(cons_pc)) - 1
   ) %>%
   ungroup() %>%
   filter(!is.na(g_predicted), !is.na(g_actual)) %>%
@@ -192,7 +185,7 @@ pwt_dev <- pwt %>%
     gap = log_g_predicted - log_g_actual
   )
 
-make_binscatter <- function(data, x_var, y_var, n_bins = 20) {
+make_binscatter <- function(data, x_var, y_var, n_bins = 100) {
   data %>%
     mutate(bin = ntile(.data[[x_var]], n_bins)) %>%
     group_by(bin) %>%
@@ -216,7 +209,7 @@ a1 <- bin_data_a1 %>%
     x = "Log Gross Predicted Consumption Growth Rate",
     y = "Log Gross Actual Consumption Growth Rate",
     title = "(A)",
-    caption = stringr::str_wrap("Notes: Binned scatter plots with 20 equal-frequency bins. The blue dashed line is the 45 degree line. The red line is OLS fit. Countries with populations below 1 million and irregular internal rates of return excluded. Data after 2019 is excluded to avoid Covid-19 distortions. Source: PWT 11.0.", width = 190)
+    caption = stringr::str_wrap("Notes: Binned scatter plots with 100 equal-frequency bins. The blue dashed line is the 45 degree line. The red line is OLS fit. Countries with populations below 1 million and irregular internal rates of return excluded. Data after 2019 is excluded to avoid Covid-19 distortions. Source: PWT 11.0.", width = 190)
   ) +
   theme_classic() +
   theme(
@@ -234,8 +227,6 @@ b1 <- make_binscatter(pwt_dev, "log_g_predicted", "gap") %>%
   ggplot(aes(x = x, y = y)) +
   geom_point(size = 2) +
   geom_smooth(method = "lm", color = "red", se = FALSE) +
-  xlim(axis_range) +
-  ylim(axis_range) +
   coord_fixed(ratio = 1) +
   labs(
     x = "Log Gross Predicted Consumption Growth Rate",
@@ -255,6 +246,104 @@ b1 <- make_binscatter(pwt_dev, "log_g_predicted", "gap") %>%
 
 a1 + b1 
 ```
+
+### Endogenous Capital Accumulation {#sec-historical-accumulation}
+
+There is a potential concern for the findings in @fig-actual-predict that the insensitivity of the actual consumption growth rate towards the model prediction signals severe model mis-specification. This would mean that the Euler equation model setup in @sec-baseline cannot capture the true underlying mechanism of consumption growth from capital investment, at least under aggregate data. However, the orthogonal polynomial regressions in @tbl-poly-fit show significant quadratic correlation between the actual and predicted log gross consumption growth rate, while the linear term correlation is not statistically significant . This suggests that a non-trivial relationship between predicted and actual growth does exist. Nonetheless, the small $R^2$ across specifications shows that the baseline model explains only a tiny fraction of the variation in actual consumption growth. \footnote{Appendix A reports significantly higher $R^2$ after adding per captia GDP growth and TFP growth as controls, suggesting more variations are explained by these factors.} Therefore, understanding the puzzle will require identifying the factors that systematically prevent households from exploiting high capital investment returns according to the baseline model prediction.
+
+```{r}
+#| label: tbl-poly-fit
+#| tbl-cap: "Polynomial Fit of Actual on Predicted Consumption Growth"
+
+reg_data <- pwt_dev %>%
+  filter(!is.na(log_g_predicted), !is.na(log_g_actual))
+
+poly_models <- list(
+  "Linear" = lm(log_g_actual ~ log_g_predicted, data = reg_data),
+  "Quadratic" = lm(log_g_actual ~ poly(log_g_predicted, 2), data = reg_data),
+  "Cubic" = lm(log_g_actual ~ poly(log_g_predicted, 3), data = reg_data)
+)
+
+coef_names <- c(
+  "log_g_predicted" = "Log Predicted Growth",
+  "poly(log_g_predicted, 2)1" = "Poly term 1",
+  "poly(log_g_predicted, 2)2" = "Poly term 2",
+  "poly(log_g_predicted, 3)1" = "Poly term 1",
+  "poly(log_g_predicted, 3)2" = "Poly term 2",
+  "poly(log_g_predicted, 3)3" = "Poly term 3",
+  "(Intercept)" = "Intercept"
+)
+
+stars <- c('*' = .05, '**' = .01, '***' = .001)
+gof <- data.frame(
+  raw = c("nobs", "r.squared"),
+  clean = c("Sample Size", "$R^2$"),
+  fmt = c("%.0f", "%.4f")
+)
+
+modelsummary(
+  poly_models,
+  coef_map = coef_names,
+  stars = stars,
+  gof_map = gof,
+  output = "kableExtra",
+  escape = FALSE,
+  align = "lccc"
+) %>%
+  add_header_above(c(" " = 1, "Log Actual Consumption Growth" = 3)) %>%
+  kable_styling(latex_options = "HOLD_position") %>%
+  gsub("\\\\end\\{tabular\\}",
+     "\\\\end{tabular}\n\\\\begin{minipage}{\\\\textwidth}\n\\\\vspace{2pt}\n\\\\footnotesize \\\\textit{Notes:} Orthogonal polynomial regressions of log actual on log predicted gross consumption growth. Standard errors in parentheses. \n\\\\end{minipage}", .)
+```
+
+A mathematically plausible way to understand the reason for @fig-actual-predict Panel (B) is to consider that households or countries that tend to under-invest in capital likely simultaneously have lower consumption growth and lower capital stocks. This means that the capital return rates should be high due to low capital stocks which predict high consumption growth, but the actual consumption growth is low because they invest sub-optimally, therefore the consumption growth gap is large. The countries with higher predicted consumption growth in @fig-actual-predict Panel (B) tend to be countries that under-invest relative to the predicted levels, have lower capital stocks, and exhibit larger consumption growth gaps. @tbl-gap-poly-fit also shows that the linear pattern is predominantly driven by large linear term coefficient while the quadratic coefficient is statistically significant but too small to be visible in the binned scatter plot.
+
+```{r}
+#| label: tbl-gap-poly-fit
+#| tbl-cap: "Polynomial Fit of Gap on Predicted Consumption Growth"
+
+reg_data <- pwt_dev %>%
+  filter(!is.na(gap), !is.na(log_g_actual))
+
+poly_models <- list(
+  "Linear" = lm(gap ~ log_g_predicted, data = reg_data),
+  "Quadratic" = lm(gap ~ poly(log_g_predicted, 2), data = reg_data),
+  "Cubic" = lm(gap ~ poly(log_g_predicted, 3), data = reg_data)
+)
+
+coef_names <- c(
+  "log_g_predicted" = "Log Predicted Growth",
+  "poly(log_g_predicted, 2)1" = "Poly term 1",
+  "poly(log_g_predicted, 2)2" = "Poly term 2",
+  "poly(log_g_predicted, 3)1" = "Poly term 1",
+  "poly(log_g_predicted, 3)2" = "Poly term 2",
+  "poly(log_g_predicted, 3)3" = "Poly term 3",
+  "(Intercept)" = "Intercept"
+)
+
+stars <- c('*' = .05, '**' = .01, '***' = .001)
+gof <- data.frame(
+  raw = c("nobs", "r.squared"),
+  clean = c("Sample Size", "$R^2$"),
+  fmt = c("%.0f", "%.4f")
+)
+
+modelsummary(
+  poly_models,
+  coef_map = coef_names,
+  stars = stars,
+  gof_map = gof,
+  output = "kableExtra",
+  escape = FALSE,
+  align = "lccc"
+) %>%
+  add_header_above(c(" " = 1, "Log Actual Consumption Growth" = 3)) %>%
+  kable_styling(latex_options = "HOLD_position") %>%
+  gsub("\\\\end\\{tabular\\}",
+     "\\\\end{tabular}\n\\\\begin{minipage}{\\\\textwidth}\n\\\\vspace{2pt}\n\\\\footnotesize \\\\textit{Notes:} Orthogonal polynomial regressions of log gap (actual - predicted) on log predicted consumption growth. Standard errors in parentheses. \n\\\\end{minipage}", .)
+```
+
+While this intuition still does not resolve the puzzle in @fig-actual-predict Panel (A) of why some countries systematically under-invest given high returns, it provides an important insight for the likely endogeneity in the capital accumulation process that is consistent with the quadratic correlation in @tbl-poly-fit. Existing literature has studied extensively sources of frictions such as credit market or institutional inefficiencies that hinder optimal capital investment given its returns. The intuition above suggests that these frictions are likely endogenous to the capital stock level, where more frictions exist in low-capital countries and the frictions cause them to accumulate capital slowly and persist with low capital stocks. Moreover, the quadratic correlation form in @tbl-poly-fit indicates that the countries on the lower and higher ends of predicted consumption growth rate experience lower actual growth, while the countries in the medium range experience the higher growth.
 
 ### Capital as a Public Good {#sec-capital-public}
 
@@ -309,7 +398,7 @@ gove1 <- gov_e_gdp %>% ggplot(aes(x = log(gdp_pc), y = gov_e)) +
     x = "Log GDP per Capita (PPP)",
     y = "Government Effectiveness",
     title = "(A)",
-    caption = stringr::str_wrap("Notes: Red line is OLS fit. Panel data from 1996 to 2023. Output-side real GDP in millions US$ at 2021 chained PPPs. Panel B shows binned scatter plots with 20 equal-frequency bins after partialling out government effectiveness. The blue dashed line is the 45 degree line. Source: PWT 11.0, WGI. Source: WDI.", width = 190)
+    caption = stringr::str_wrap("Notes: Red line is OLS fit. Panel data from 1996 to 2023. Output-side real GDP in millions US$ at 2021 chained PPPs. Panel B shows binned scatter plots with 100 equal-frequency bins after partialling out government effectiveness. The blue dashed line is the 45 degree line. Source: PWT 11.0, WGI. Source: WDI.", width = 190)
   ) +
   theme_classic() +
   theme(
@@ -353,17 +442,13 @@ gove2 <- bin_data_gove2 %>%
 gove1 + gove2
 ```
 
-To illustrate, I will present an extreme case where we assume capitals are all publicly invested through taxation by governments. Consider the same optimisation problem as @eq-optimisation with a different budget constraint for homogeneous households in an economy. For any household $i$, the budget constraint is: $$
-x_{i,t+1} = \frac{1}{N} \cdot f'(K_t) \cdot [(x_{i,t} - C_{i,t}) + \sum_{\forall j \neq i} (x_{j,t} - C_{j, t})],
-$$ {#eq-budget-public} where $N$ is the total number of households in the economy, and $\sum_{\forall j \neq i} (x_{j,t} - C_{j, t})$ is the aggregate public investment from all other households. Because public capitals can only be invested collectively, the total returns depend on the aggregate investment level. For simplicity, assume each individual household receive an equal share of the total returns, public capital investment is the only government expenditure, and the government has perfect efficiency.
+To illustrate, I will present an extreme case where we assume capitals are all publicly invested through taxation by governments. Consider the same optimisation problem as @eq-optimisation with a different budget constraint for homogeneous households in an economy. For any household $i$, the budget constraint is: $$x_{i,t+1} = \frac{1}{N} \cdot [(1-d) + f'(K_t)] \cdot [(x_{i,t} - C_{i,t}) + \sum_{\forall j \neq i} (x_{j,t} - C_{j, t})],$$ {#eq-budget-public} where $N$ is the total number of households in the economy, and $\sum_{\forall j \neq i} (x_{j,t} - C_{j, t})$ is the aggregate public investment from all other households. Because public capitals can only be invested collectively, the total returns depend on the aggregate investment level. For simplicity, assume each individual household receive an equal share of the total returns, public capital investment is the only government expenditure, and the government has perfect efficiency.
 
 #### Weak Taxation Capacity {.unnumbered}
 
 First consider a scenario where the state taxation capacity is weak. To reflect weak taxation capacity, assume that household $i$ makes public investment decision through taxation voluntarily and independent of other households' decisions. From the perspective of household $i$, the total returns from public capital investment as a public good is diluted among the population. Alternatively, for a fixed level of total returns on public capital, the impact of the household's investment level $(x_{i,t} - C_{i,t})$ on its assets in the next period is small for large $N$.
 
-Solving for optimal intertemporal consumption path for household $i$ given $\sum_{\forall j\ne i} (x_{jt} - C_{jt})$:$$
-u'(C_{i,t}) = \frac{1}{N} \cdot \delta f'(K_t) u'(C_{i, t+1}).
-$$ {#eq-euler-public} Notice that when $N=1$, this equation is identical to @eq-euler, but $u'(C_{i.t})$ decreases as $N$ becomes larger. For increasing and concave utility function, $u'(C_{i,t})$ is smaller when $C_{i,t}$ is larger. This means that household $i$ will consume more and invest less as $N$ increases. For sufficiently large $N$ so that the Euler Equation cannot be satisfied by an interior solution, household $i$ will optimally choose a corner solution of consuming all and invest none. $\frac{1}{N}$ produces a collective action problem where the global optimal decision is for all households to invest and benefit from high $f'(K)$ but individuals households have a dominant strategy of not investing.
+Solving for optimal intertemporal consumption path for household $i$ given $\sum_{\forall j\ne i} (x_{jt} - C_{jt})$: $$u'(C_{i,t}) = \frac{1}{N} \cdot \delta \cdot [(1-d) + f'(K_t)] \cdot u'(C_{i, t+1}).$$ {#eq-euler-public} Notice that when $N=1$, this equation is identical to @eq-euler, but $u'(C_{i.t})$ decreases as $N$ becomes larger. For increasing and concave utility function, $u'(C_{i,t})$ is smaller when $C_{i,t}$ is larger. This means that household $i$ will consume more and invest less as $N$ increases. For sufficiently large $N$ so that the Euler Equation cannot be satisfied by an interior solution, household $i$ will optimally choose a corner solution of consuming all and invest none. $\frac{1}{N}$ produces a collective action problem where the global optimal decision is for all households to invest and benefit from high $f'(K)$ but individuals households have a dominant strategy of not investing.
 
 @fig-tax-gdp shows the countries with lower GDP per capita have lower tax revenue relative to their GDP. Therefore, this scenario is more consistent with lower-income settings and it is consistent with the reluctant tax compliance attitude among many low- and middle-income settings. This framework also provides an explanation to the prima facie irrationality of tax avoidance in lower-income countries where people can benefit largely from public investments.
 
@@ -424,53 +509,23 @@ tax_gdp %>%
 
 Higher income countries tend to have stronger taxation capacity because, for example, income tax can be more easily collected from employees [@jensen2022]. Although, public investment is less voluntary for tax rates as given, households might make public investment decisions by influencing the tax rates through political channels. The key difference is that they are more likely to expect other households to also comply with the decided upon tax rates.
 
-Consider a simple case of homogeneous households facing the same optimisation problem as @eq-optimisation but assume instead perfect enforcability upon any chosen taxation level and perfect government efficiency. Any individual household $i$ chooses a taxation level (public investment level) $(x_{i,t} - C_{it})$ and expect symmetry from other households. Because households are homogeneous, the following should hold: $$
-[(x_{i,t} - C_{i,t}) + \sum_{\forall j \neq i} (x_{j,t} - C_{j, t})] = N \cdot (x_{i,t} - C_{i,t}),
-$$so that the budget constraint becomes identical to @eq-budget: $$
-x_{i,t+1} = \frac{1}{N} \cdot f'(K_t)\cdot N \cdot (x_{i,t} - C_{i,t}) = f'(K_t)(x_{i,t} - C_{i,t}).
-$$ Solving for optimal consumption path will produce an Euler Equation identical to @eq-euler. Notice that the collective action problem is resolved in this setting because the perfect tax enforcement enables households to optimise consumption conditional on the expectation of symmetrical behaviours from others.
+Consider a simple case of homogeneous households facing the same optimisation problem as @eq-optimisation but assume instead perfect enforcability upon any chosen taxation level and perfect government efficiency. Any individual household $i$ chooses a taxation level (public investment level) $(x_{i,t} - C_{it})$ and expect symmetry from other households. Because households are homogeneous, the following should hold: $$[(x_{i,t} - C_{i,t}) + \sum_{\forall j \neq i} (x_{j,t} - C_{j, t})] = N \cdot (x_{i,t} - C_{i,t}),$$ so that the budget constraint becomes identical to @eq-budget: $$x_{i,t+1} = \frac{1}{N} \cdot [(1-d) + f'(K_t)] \cdot N \cdot (x_{i,t} - C_{i,t}) = [(1-d) + f'(K_t)](x_{i,t} - C_{i,t}).$$ Solving for optimal consumption path will produce an Euler Equation identical to @eq-euler. Notice that the collective action problem is resolved in this setting because the perfect tax enforcement enables households to optimise consumption conditional on the expectation of symmetrical behaviours from others.
 
-### A Generalised Model {#sec-generalised-model}
+### A Generalised Static Model {#sec-generalised-model}
 
-The collective action problem explored above is an example channel to explain why public capital investment frictions exist. In reality, there are likely many interacted channels and the specific functional form is difficult to define. Even for the collective action model, it is very reasonable to believe that the severity of the problem is not sensitive to the population size in a country linearly. Nonetheless, the public capital investment frictions at the household-decision level can be generalised as a wedge $\phi_{pub} \in [0, 1]$ where lower values indicate larger frictions. Moreover, recall that the literature also highlights various channels for the private-side frictions, so that the private-side frictions can be also generalised by $\phi_{priv} \in [0, 1]$ analogously. A generalised intertemporal household opitmisation model with both private and public capital returns has the following budget constraint: $$
-x_{t+1} = r_t^{eff} \cdot (x_t - C_t),
-$$ {#eq-budget-combined} where $$
-r_t^{eff} = (1-\tau) \cdot \phi^{priv} \cdot f'(K^{priv}_t) + \tau \cdot \phi^{pub} \cdot f'(K^{pub}_t),
-$$ with $K^{priv}$ denoting private capital stock and $\tau$ denoting the share of the total investment amount that the household chooses to invest in public capital. Notice that households choose $\tau$ freely to maximise their budget constraint. Because $f'(K_t^{priv})$ and $f'(K_t^{pub})$ are concave, this means that at equilibrium: $$
-\phi^{priv} \cdot f'(K_t^{priv}) = \phi^{pub} \cdot f'(K_t^{pub})
-$$ and rearranging: $$
-\frac{\phi^{pub}}{\phi^{priv}} = \frac{f'(K_t^{priv})}{f'(K_t^{pub})}
-$$ {#eq-ff} shows that the ratio between the public and private capital investment frictions can be given by the ratio between the marginal investment returns from private and public capital.
+The collective action problem explored above is an example channel to explain why public capital investment frictions exist. In reality, there are likely many interacted channels and the specific functional form is difficult to define. Even for the collective action model, it is very possible that the severity of the problem is not linearly sensitive to the population size in a country. Nonetheless, the public capital investment frictions at the household-decision level can be generalised as a wedge $\phi_{pub} \in [0, 1]$ where lower values indicate larger frictions. Moreover, recall that the literature also highlights various channels for the private-side frictions, so that the private-side frictions can be also generalised by $\phi_{priv} \in [0, 1]$ analogously. A generalised intertemporal household opitmisation model with both private and public capital returns has the following budget constraint: $$x_{t+1} = [(1-d) +r_t^{eff}] \cdot (x_t - C_t),$$ {#eq-budget-combined} where $$r_t^{eff} = (1-\tau) \cdot \phi^{priv} \cdot f'(K^{priv}_t) + \tau \cdot \phi^{pub} \cdot f'(K^{pub}_t),$$ with $K^{priv}$ denoting private capital stock and $\tau$ denoting the share of the total investment amount that the household chooses to invest in public capital. Notice that households choose $\tau$ freely to maximise their budget constraint. Because $f'(K_t^{priv})$ and $f'(K_t^{pub})$ are concave, this means that at equilibrium: $$\phi^{priv} \cdot f'(K_t^{priv}) = \phi^{pub} \cdot f'(K_t^{pub})$$ and rearranging: $$\frac{\phi^{pub}}{\phi^{priv}} = \frac{f'(K_t^{priv})}{f'(K_t^{pub})}$$ {#eq-ff} shows that the ratio between the public and private capital investment frictions can be given by the ratio between the marginal investment returns from private and public capital.
 
-Solving for optimal consumption path under the above constraint produces an Euler Equation: $$
-u'(C_t) = \delta \cdot r^{eff} \cdot u'(C_{t+1}),
-$$ and the consumption growth rate is given by:
+Solving for optimal consumption path under the above constraint produces an Euler Equation: $$u'(C_t) = \delta \cdot [(1-d) +r_t^{eff}] \cdot u'(C_{t+1}),$$ and the consumption growth rate is given by:
 
-$$
-\frac{C_{t+1}}{C_t} - 1 = (\delta \cdot r^{eff})^{\frac{1}{\sigma}} - 1.
-$$ {#eq-growth-combined}
+$$\frac{C_{t+1}}{C_t} - 1 = \{\delta [(1-d) +r_t^{eff}])\}^{\frac{1}{\sigma}} - 1.$$ {#eq-growth-combined}
 
-Recall the pattern illustrated in @fig-actual-predict Panel (B): countries with higher predicted consumption growth rates tend to exhibit larger gaps between predicted and actual growth. Under the above model, this can be expected even if the private investment channel is frictionless.
+Recall the pattern illustrated in @fig-actual-predict Panel (B): countries with higher predicted consumption growth rates tend to exhibit larger gaps between predicted and actual growth. Under the above model, the interpretation is that the combined frictions from both channels are higher in lower-income countries with high returns on both types of capital so that households rationally under-invest because the expected capital returns are lower than the realised returns.
 
 ## Accounting the Public Capital Investment Frictions {#sec-stylised}
 
-The theoretical model features four structural parameters: $$
-\Theta = \{\delta, \sigma, \tau, \phi\},
-$$ where $\delta$ is the annual discount factor, $\sigma$ is the risk aversion coefficient and $\frac{1}{\sigma}$ is the elasticity of intertemporal substitution, $\tau$ is the share of total investment in public capital, and $\phi$ is the severity of the collective action problem for public capital investment. To discipline the model, I exogenously fix $\delta = 0.96$ and $\sigma = 2$ proposed by @kremer2019 based on the literature, same with the exercise in @fig-actual-predict. Although in the theoretical model, $\tau$ is chosen by the households, the public capital investment shares from ICSD can be interpretated as the equilibrium outcome of this choice.
+The theoretical static model features four structural parameters: $$\Theta = \{\delta, \sigma, \tau, \phi\},$$ where $\delta$ is the annual discount factor, $\sigma$ is the risk aversion coefficient and $\frac{1}{\sigma}$ is the elasticity of intertemporal substitution, $\tau$ is the share of total investment in public capital, and $\phi$ is the severity of the collective action problem for public capital investment. To explore the data under the static model, I discipline the model by exogenously fix $\delta = 0.96$ and $\sigma = 2$ proposed by @kremer2019 based on the literature, same with the exercise in @fig-actual-predict. Although in the theoretical model, $\tau$ is chosen by the households, the public capital investment shares from ICSD can be interpretated as the equilibrium outcome of this choice.
 
-To use macroeconomic data, I proxy for the returns on private and public capitals households face by the following Cobb-Douglas production function facing a representative household in the economy: $$ Y_{it} = A_{it}(K_{it}^{priv})^{\alpha^{priv}}(K_{it}^{pub})^{\alpha^{pub}}L_{it}^{1-\alpha^{priv}-\alpha^{pub}}, $$ where the first-order conditions are: $$ f'(K_{it}^{priv}) = \alpha_{priv} \cdot \frac{Y_{it}}{K_{it}^{priv}} \quad \text{and} \quad f'(K_{it}^{pub}) = \alpha_{pub} \cdot \frac{Y_{it}}{K_{it}^{pub}}. $$ Taking the conservative estimate of short-run national-level output elasticity of public capital 0.083 gives: $$
-f'(K_{it}^{pub}) = 0.083 \left(\frac{Y_{it}}{K_{it}^{pub}}\right)
-$$ Assume for simplicity the labour market is competitive in aggregate, $$
-w = \frac{\partial Y}{\partial L} = (0.917 - \alpha^{priv})\frac{Y}{L},
-$$ so that: $$
-\alpha^{priv} = 0.917 - \frac{wL}{Y},
-$$ where the PWT provides the data on the labour share of income. This approach would give a mean output elasticity of labour around 0.523, and a mean ouput elasticity of private capital around 0.394.
-
-### Ratios between Private and Public Capital Returns {#sec-diff-pp}
-
-Recall the equilibrium condition of @eq-ff, I can rewrite: $$
-\frac{\phi_{it}^{pub}}{\phi_{it}^{priv}} = \frac{f'(K_{it}^{priv})}{f'(K_{it}^{pub})} = \frac{\alpha^{priv}}{\alpha^{pub}_{it}} \left(\frac{K_{it}^{pub}}{K_{it}^{priv}}\right)
-$$ Using the above condition and the conservative output elasticity of public capital 0.083, @fig-f-diff shows most countries across time have larger public-side wedge compared to the private side, where the marginal returns on private capital investment is higher than public capital investment. This is an indication that the private capital investment frictions are higher on average across levels of development. (**INSERT SENSITIVITY TEST)** However, the red OLS fit shows that this pattern is more prominent on the lower log per capital GDP end, and it attenuates towards the higher end. This pattern is also robust after controlling for country and year fixed effects. **(INSERT ANNEX)** Recall @fig-actual-predict that lower-income countries tend to have higher overall frictions, @fig-f-diff may suggest that the public capital investment frictions contribute less to the overall high frictions in lower-income countries, and the private-side frictions are more likely to be the driving force.
+To use macroeconomic data, I proxy for the returns on private and public capitals households face by the following Cobb-Douglas production function facing a representative household in the economy: $$ Y_{it} = A_{it}(K_{it}^{priv})^{\alpha^{priv}}(K_{it}^{pub})^{\alpha^{pub}}L_{it}^{1-\alpha^{priv}-\alpha^{pub}}, $$ where the first-order conditions are: $$ f'(K_{it}^{priv}) = \alpha_{priv} \cdot \frac{Y_{it}}{K_{it}^{priv}} \quad \text{and} \quad f'(K_{it}^{pub}) = \alpha_{pub} \cdot \frac{Y_{it}}{K_{it}^{pub}}. $$ {#eq-returns} I use the calibrate using the results from @bom2014 to fix the output elasticity of public capital while allowing the output elasticity of private capital to move mechanically. For the short-run output elasticity of private capital, assuming for simplicity the labour market is competitive in aggregate: $$w_{it} = \frac{\partial Y_{it}}{\partial L_{it}} = (1 - \alpha^{pub}_{short} - \alpha^{priv}_{it})\frac{Y_{it}}{L_{it}},$$ so that: $$\alpha^{priv}_{short,it} = 1 - \alpha^{pub}_{short} - \left(\frac{wL}{Y}\right)_{it},$$ {#eq-a-short} where the PWT provides the data on the labour share of income which is equivalent to the output elasticity of labour. Using the conservative national short-run estimate of 0.083 for $\alpha^{pub}$, this approach derives a pooled mean output elasticity of labour of 0.523, and a pooled mean ouput elasticity of private capital of 0.394. @bom2014 merge the cointegrated relationship variable and models featuring long differences variables and estimate the mean long-run elasticity of 0.122 based on this composite variable. This is consistent with the nature of longer time horizons for public projects like infrastructures and therefore longer time horizon for the returns to materialise. To capture this nature, the long-run elasticity of private capital should be calculated over every 5 year non-overlapping horizon: $$\alpha^{priv}_{long,i,[t, t+4]} = 1 - \alpha^{pub}_{long} - \left(\frac{wL}{Y}\right)_{i, [t, t+4]},$$ {#eq-a-long} and this derives a pooled mean output elasticity of labour of 0.518, and a pooled mean output elasticity of 0.36.
 
 ```{r}
 #| label: read-icsd
@@ -515,50 +570,48 @@ icsd_capital <- icsd %>%
 f_diff <- pwt %>%
   filter(!is.na(labsh)) %>%
   mutate(gdp_pc = rgdpo / pop) %>%
-  select(countrycode, labsh, year, gdp_pc, rgdpo) %>%
   left_join(icsd_capital, by = c("countrycode" = "iso3c", "year" = "TIME_PERIOD")) %>%
   filter(!is.na(k_pub), !is.na(k_priv), k_pub > 0, k_priv > 0) %>%
+  
+  # Create 5 year horizon variables
+  group_by(countrycode) %>%
+  arrange(year) %>%
   mutate(
-    alpha_pub = 0.083,
+    window = floor((year - min(year)) / 5),
+    n_in_window = n()
+  ) %>%
+  group_by(countrycode, window) %>%
+  mutate(
+    labsh_5y = mean(labsh, na.rm = TRUE),
+    rgdpo_5y = mean(rgdpo, na.rm = TRUE),
+    k_pub_5y = mean(k_pub, na.rm = TRUE),
+    k_priv_5y = mean(k_priv, na.rm = TRUE),
+    n_in_window = n()
+  ) %>%
+  ungroup() %>%
+  
+  mutate(
     k_ppp = replace_na(k_ppp, 0),
+    
+    # Short-run
+    alpha_pub = 0.083,
     alpha_priv = 1 - alpha_pub - labsh,
     phi = (alpha_priv / alpha_pub) * (k_pub / k_priv),
     f_pub = alpha_pub * (rgdpo / (k_pub * 1000)),
-    f_priv = alpha_priv * (rgdpo / (k_priv * 1000))
+    f_priv = alpha_priv * (rgdpo / (k_priv * 1000)),
+    
+    # Long-run
+    alpha_pub_long = 0.122,
+    alpha_priv_long = 1 - alpha_pub_long - labsh_5y,
+    phi_long = (alpha_priv_long / alpha_pub_long) * (k_pub_5y / k_priv_5y),
+    f_pub_long = alpha_pub_long * (rgdpo_5y / (k_pub_5y * 1000)),
+    f_priv_long = alpha_priv_long * (rgdpo_5y / (k_priv_5y * 1000))
   )
 ```
 
-```{r}
-#| label: fig-f-diff
-#| fig-cap: "Ratio of Private to Public Capital Returns by Log GDP per Capita"
-#| fig-cap-location: top
+### Difficulty to Isolate the Public Channel {#sec-selfemp}
 
-f_diff %>%
-  filter(!is.na(phi), !is.na(gdp_pc), phi > 0) %>%
-  ggplot(aes(x = log(gdp_pc), y = log(phi))) +
-  geom_point(alpha = 0.1, size = 0.5) +
-  geom_hline(yintercept = 0, linetype = "dashed", color = "blue") +
-  geom_smooth(method = "lm", color = "red", se = FALSE) +
-  labs(
-    x = "Log GDP per Capita",
-    y = "Log Ratio of Private to Public Capital Returns",
-    caption = stringr::str_wrap("Notes: Dashed line is when the ratio is 1 (log = 0). Red line is OLS fit. Sources: PWT 11.0, ICSD.", width = 100)
-  ) +
-  theme_classic() +
-  theme(
-    plot.margin = margin(t = 5, r = 15, b = 5, l = 5),
-    panel.border = element_rect(colour = "black", fill = NA, linewidth = 0.5),
-    axis.ticks.length = unit(-0.15, "cm"),
-    axis.text.x = element_text(margin = margin(t = 0.3, unit = "cm")),
-    axis.text.y = element_text(margin = margin(r = 0.3, unit = "cm")),
-    plot.caption = element_text(hjust = 0, size = 8, face = "italic"),
-    plot.caption.position = "plot"
-  )
-```
-
-### Incidental Motivating Evidence from Self-Employment Share {#sec-grid}
-
-Ideally, $\phi^{pub}$ may be approximated by a variable that is differentially associated with the public capital investment channel but not with the private channel, and @sec-capital-public and @besley2013 show that it should likely relate to government taxation capacities. The self-employment share in total employment might be a proxy to consider in this context. @jensen2022 identifies that the income tax exemption threshold co-moves with the employee/self-employed composition over development, such that the tax base consistently covers segments where third-party enforceable employee income predominates (85–95% employee share). This is primarily because that taxing self-employment is administratively more difficult, so governments target only employee incomes to protect tax morale. This pattern is consistent with @tbl-selfemp Panel (A) which shows higher self-employment percentage in total employment significantly associates with lower log public capital investment across specifications. However, @tbl-selfemp Panel (B) shows that the pattern is very similar for the private capital investment channel. This means either self-employment share is correlated with both the private and public capital investment frictions through different mechanisms, or the frictions from both sides are highly correlated. Although this means that self-employment share is likely a bad proxy for $\phi^{pub}$ specifically, the similar coefficients across both channels suggest that self-employment share provides a symmetric signal to both channels. This motivates a test on the correlation between both friction channels and a grid search exercise utilising the symmetric signal from self-employment share.
+Ideally, $\phi^{pub}$ may be approximated by a variable that is associated with the public capital investment channel but not with the private channel, and @sec-capital-public and @besley2013 show that it should likely relate to government taxation capacities. The self-employment share in total employment is a natural candidate in this context. @jensen2022 identifies that the income tax exemption threshold co-moves with the employee/self-employed composition over development, such that the tax base consistently covers segments where third-party enforceable employee income predominates (85–95% employee share). This pattern is consistent with @tbl-selfemp Panel (A) which shows higher self-employment percentage in total employment significantly associates with lower log public capital investment across specifications. However, @tbl-selfemp Panel (B) shows a highly similar pattern for the private capital investment channel. This means either self-employment share is correlated with both the private and public capital investment returns through channels like financial institution, or the frictions from both sides are highly correlated. Notice that under @eq-ff, correlation between the private and public capital returns implies correlation between the frictions from both sides. In either case, self-employment share is likely not a good proxy to distinguish $\phi^{pub}$ from the overall investment friction. Identifying isolated effects from specific channels is commonly challenging using aggregate data. Therefore attempting alternative identification strategies is beyond the scope of this paper. Nonetheless, this empirical finding motivates a follow-up test on the correlation between both friction channels.
 
 ```{r}
 #| label: data-self-employment
@@ -668,11 +721,17 @@ out %>%
 
 ### Limited Cross-Channel Frictions Spillovers
 
-Countries with high self-employment shares tend to be lower-income countries that share characteristics like prevalent liquidity constraints, property rights insecurity, or institutional ineffectiveness that could affect both the private and public capital investment frictions simultaneously. @tbl-granger shows Granger tests on first-differenced \footnote{Im-Pesaran-Shin panel tests fail to reject the null of a unit root for both log $f'(K^{priv})$ ($p = 0.28$) and log $f'(K^{pub})$ ($p \approx 1.00$) in levels, but strongly reject in first differences ($p < 0.001$ for both).} log marginal returns from private and private capital. Changes in public capital marginal returns exhibit significant positive autocorrelation (lagged own coefficient 0.17–0.23), while the private side does not. This asymmetry suggests slower adjustment in public investment, meaning that public capital investment frictions are sticker, while the market adjusts faster on the private side. This is consistent with factors like political inertia, long infrastructure project duration, discontinuous government budgets which do not impact private-side investments. There are statistically significant small spillovers from the public capital investment frictions to the private side, but the reverse are even smaller in magnitude and less robust across specifications. This suggests although spillovers between the private and public friction channels exist, the frictions also operate largely via different mechanisms. Therefore, this is also motivating evidence to study the public capital investment channel separately from the private channel.
+Countries with high self-employment shares tend to be lower-income countries that share characteristics like prevalent liquidity constraints, property rights insecurity, or institutional ineffectiveness that could affect both the private and public capital investment frictions simultaneously. If this were the case, it would be a mistake to treate the two channels separately in any empirical work. Computing the marginal capital returns according to @eq-returns and test for dynamic relationship between them is informative of the correlation between the frictions from each side under @eq-ff. This is because the capital returns change due to investment behaviours correlated to investment frictions from the two channels, therefore dynamic relationship between private and public capital returns can signal correlation between the friction channels. However, one caveat is that dynamic relations can also occur due to the upward bias from common trends that do not necessarily create associations between the friction channels, but this also means that the real association is likely below the estimated levels.
+
+@tbl-granger shows Granger tests on first-differenced \footnote{Im-Pesaran-Shin panel tests fail to reject the null of a unit root for both log $f'(K^{priv})$ ($p = 0.28$) and log $f'(K^{pub})$ ($p \approx 1.00$) in levels, but strongly reject in first differences ($p < 0.001$ for both).} log short-run marginal returns from private and public capital. Changes in public capital marginal returns exhibit significant positive autocorrelation (lagged own coefficient 0.17–0.23), while the private side does not. This asymmetry suggests slower adjustment in public investment, meaning that public capital investment frictions are sticker, while the market adjusts faster on the private side. This is consistent with factors like political inertia, long infrastructure project duration, discontinuous government budgets which do not impact private-side investments. There are statistically significant small spillovers from the public capital investment frictions to the private side, but the reverse are even smaller in magnitude and less robust across specifications. The tiny within $R^2$ under country and year fixed effects also indicate that lagged cross-channel and own-channel returns explain a small fraction of within-country variation in marginal returns at annual frequency.
+
+@tbl-granger-long shows the Granger tests results for long-run private and public capital returns over five-year windows. The coefficients on own-channel returns are larger and more significant compared to the short run across all specifications. The stickier own-channel persistence in the long run is likely due to the five-year window reflecting more long-term structural economic trends like industrial, institutional, or TFP trajectories. However, although the private-to-public spillovers are still small, the magnitude almost doubles and the shrinking significance levels are likely resulted from shrinking sample size. This is likely also related to the coefficient absorbing the long-term trends. The long-run public-to-private spillovers attenuate instead. The increasing within $R^2$ under country and year fixed effect indicate that the long-run model has a better explanatory power.
+
+Recall that the cross-channel spillovers can be over-estimated based on the current models by omitting common investment and structural economic trends. Nonetheless, the small magnitude of cross-channel spillovers likely indicate that the correlation between the two investment channels are likely small. Under the country and year fixed effects, both short-and long-run spillover coefficients are not significant when controlling for total factor productivity, while the Granger tests on log first-differenced capital accumulation level estimate the largest coefficient of public-to-private spillovers of 0.177 ($p < 0.1$) which is still small in magnitude. The overall empirical evidence suggest although spillovers between the private and public friction channels exist, the two investment channels and by extension the fricitons operate largely via separate mechanisms. Therefore, studying the public and private capital investment channels separately is important based on this finding.
 
 ```{r}
 #| label: tbl-granger
-#| tbl-cap: "Granger Tests"
+#| tbl-cap: "Short-Run Granger Tests"
 
 f_diff_panel <- panel(f_diff, ~countrycode + year)
 
@@ -736,157 +795,196 @@ out %>%
   row_spec(panel_b_row + n_b, hline_after = TRUE) %>%
   row_spec(panel_b_row + n_b, hline_after = TRUE) %>%
   gsub("\\\\end\\{tabular\\}", 
-       "\\\\end{tabular}\n\\\\begin{minipage}{\\\\textwidth}\n\\\\vspace{2pt}\n\\\\footnotesize \\\\textit{Notes:} First difference removes AR(1) structure. Standard errors clustered at the country level in parentheses. $^{*}p<0.05$, $^{**}p<0.01$, $^{***}p<0.001$.\n\\\\end{minipage}", .)
+       "\\\\end{tabular}\n\\\\begin{minipage}{\\\\textwidth}\n\\\\vspace{2pt}\n\\\\footnotesize \\\\textit{Notes:} Short-run specification uses Bom-Ligthart (2014) short-run elasticity 0.083. First difference removes AR(1) structure. Standard errors clustered at the country level in parentheses. $^{*}p<0.05$, $^{**}p<0.01$, $^{***}p<0.001$.\n\\\\end{minipage}", .)
 ```
 
-### Grid Search Exercise {#sec-grid-search}
-
-Since @tbl-selfemp shows symmetric associations between self-employment share and log private and public investment levels, I use this signal from self-employment share to explore the relative importance of either channel in explaining the consumption gap. Using self-employment share as a proxy for $\phi^{priv}$ and $\phi^{pub}$ and to allow different values across countries and time, I parameterise both wedges for country $i$ in year $t$ with the following logistic function to be bounded between 0 and 1: $$
-\phi_{it} = \frac{1}{1 + \exp(\beta_0 + \beta_1 \cdot SelfEmp_{it})}
-$$ {#eq-logistic} I assume perfect foresight so that the Euler equation yields $C_{i,t+1} / C_{it} = (\delta \cdot r_{i, t+1}^{eff})^{1/\sigma}$. For estimation, I take logs on both sides to render the estimating equation additive and stabilise the variance of consumption growth: $$
-\ln (\frac{C_{i,t+1}}{C_{i,t}}) = \frac{1}{\sigma} \ln(\delta \cdot r^{eff}_{it}(\beta_0, \beta_1)) + \varepsilon_{it},
-$$ where $$
-r^{eff}_{it} = 1 - d_{it} + (1-\tau_{it}) \cdot \phi_{it}^{priv} \cdot f'(K^{priv}_{it}) + \tau_{it} \cdot \phi_{it}^{pub} \cdot f'(K^{pub}_{it})
-$$ is the gross effective return per unit of savings, combining undepreciated capital and marginal products net of channel-specific frictions. The residual term $\varepsilon_{it}$ captures all other possible channels such as credit constraints or institutional features and $d_{it}$ denotes capital depreciation rates from the PWT data.
-
-I perform two grid search exercises assuming one channel to be frictionless and use @eq-logistic to proxy for the wedge of the other channel. The grid search will find a combination of $\beta_0$ and $\beta_1$ to minimise the sum of squared error (SSE) of the difference between log consumption growth and the model predictions under the specified range. Under the same grid search space, @fig-grid-search Panel (A) shows that assuming frictionless private investment channel, the grid search cannot find a unique interior combination of the coefficients to reduce the gap between actual consumption growth and model predictions effectively via only the public channel **(INSERT ANNEX)**; Panel (B) assuming instead that the public channel is frictionless, the grid search finds an optimal combination of $\beta_0 = 0.2$ and $\beta_1 = 0.015$. The heat map in Panel (B) shows a clear convergence pattern to an interior solution, while Panel (B) shows substantially flatter SSE surface. There are four following possible explanations for this asymetric pattern.
-
-1.  The functional form is significantly mi-specified;
-
-2.  The signals from self-employment share are weak in relation to public capital investment frictions;
-
-3.  Cross-country and -time variations on public capital investment frictions are too weak;
-
-4.  The public capital investment frictions channel is weaker in explaining the overall frictions.
-
-Responding to the first explanation. The flatter SSE surface in @fig-grid-search Panel (A) than Panel (B) indicates that plugging the self-employment proxy in the private friction channel absorbs the error term better than in the public friction channel. However, if there are omitted factors that associate with self-employment but affect one channel more than the other, the functional form in this exercise may absorb these omitted effects asymmetrically when effects are restricted to act via only one channel each time. In that case, the convergence in Panel (B) could partly reflect self-employment capturing omitted channels rather than the private-side frictions genuinely explaining more of the overall gap. Nonetheless, @tbl-selfemp suggests that the signal from self-employment affects the private and public investments similarly which could indicate similar associations between omitted factors and both private and public friction channels. The only caveat is that factors signaled by self-employment share might associate with different forms of productivity which could affect returns from private or public capital returns differently, and @tbl-selfemp cannot rule out this mechanism. Moreover, the asymmetric pattern cannot be attributed to the logistic proxy functional form because it should have impacted both channels rather than only the public channel.
-
-The second and third explanation can be plausibly ruled out. @tbl-selfemp shows symmetric significant associations between self-employment share and both private and public investment channels, and @fig-grid-search Panel (B) shows that the grid search range provides sufficiently well-defined SSE surface for convergence. Therefore, it is unlikely that self-employment provides sufficiently strong signal for the private channel but not the public channel. Moreover, the within $R^2$ rows in @tbl-selfemp also shows sufficient cross-country and -time variations under year and country fixed effect specifications.
-
-Therefore, the pattern from the grid search exercises most plausibly reflect the fourth explanation that the private capital investment friction channel explains more of the consumption growth rate gap than the public friction channel. This is also consistent with the pattern in @fig-f-diff.
-
 ```{r}
-#| label: data-estimation-prep
+#| label: tbl-granger-long
+#| tbl-cap: "Long-Run Granger Tests"
 
-est_data <- pwt_dev %>%
-  select(countrycode, year, log_g_actual, cons_pc, labsh, delta) %>%
-  left_join(self_emp, by = c("countrycode" = "iso3c", "year")) %>%
-  left_join(icsd_capital, by = c("countrycode" = "iso3c", "year" = "TIME_PERIOD")) %>%
-  left_join(
-    icsd %>%
-      filter(str_detect(INDICATOR, "Gross domestic product.*PPP")) %>%
-      mutate(gdp_icsd = as.numeric(OBS_VALUE)) %>%
-      select(iso3c, TIME_PERIOD, gdp_icsd),
-    by = c("countrycode" = "iso3c", "year" = "TIME_PERIOD")
-  ) %>%
-  filter(!is.na(self_emp), !is.na(k_pub), !is.na(k_priv),
-         !is.na(labsh), !is.na(gdp_icsd), !is.na(log_g_actual),
-         k_pub > 0, k_priv > 0) %>%
-  mutate(
-    alpha_pub = 0.083,
-    alpha_priv = 1 - alpha_pub - labsh,
-    f_pub = alpha_pub * (gdp_icsd / k_pub),
-    f_priv = alpha_priv * (gdp_icsd / k_priv),
-    tau = k_pub / (k_pub + k_priv)
+f_diff_collapsed <- f_diff %>%
+  group_by(countrycode, window) %>%
+  dplyr::summarise(
+    f_pub_long = first(f_pub_long),
+    f_priv_long = first(f_priv_long),
+    .groups = "drop"
   )
-```
 
-```{r}
-#| label: fig-grid-search
-#| fig-cap: "Grid Search"
-#| fig-cap-location: top
-#| fig-width: 6
-#| fig-height: 7
-#| eval: true
+f_diff_long_panel <- panel(f_diff_collapsed, ~countrycode + window)
 
-grid <- expand.grid(
-  beta0 = seq(-50, 50, by = 0.1),
-  beta1 = seq(-0.1, 1.0, by = 0.005)
+# Panel A: DV = f'(K^priv) long, Panel B: DV = f'(K^pub) long
+specs_long <- list(
+  priv = d(log(f_priv_long)) ~ l(d(log(f_pub_long)), 1) + l(d(log(f_priv_long)), 1),
+  pub  = d(log(f_pub_long))  ~ l(d(log(f_priv_long)), 1) + l(d(log(f_pub_long)), 1)
 )
 
-# Public channel
-sse_pub <- sapply(1:nrow(grid), function(i) {
-  b0 <- grid$beta0[i]
-  b1 <- grid$beta1[i]
-  phi <- 1 / (1 + exp(b0 + b1 * est_data$self_emp))
-  r_eff <- 1 - est_data$delta + (1 - est_data$tau) * est_data$f_priv + est_data$tau * phi * est_data$f_pub
-  if (any(r_eff <= 0, na.rm = TRUE)) return(Inf)
-  log_g_predicted <- (1 / 2) * log(0.96 * r_eff)
-  resid <- est_data$log_g_actual - log_g_predicted
-  sum(resid^2, na.rm = TRUE)
-})
-
-# Private channel
-sse_priv <- sapply(1:nrow(grid), function(i) {
-  b0 <- grid$beta0[i]
-  b1 <- grid$beta1[i]
-  phi <- 1 / (1 + exp(b0 + b1 * est_data$self_emp))
-  r_eff <- 1 - est_data$delta + (1 - est_data$tau) * phi * est_data$f_priv + est_data$tau * est_data$f_pub
-  if (any(r_eff <= 0, na.rm = TRUE)) return(Inf)
-  log_g_predicted <- (1 / 2) * log(0.96 * r_eff)
-  resid <- est_data$log_g_actual - log_g_predicted
-  sum(resid^2, na.rm = TRUE)
-})
-
-grid$sse_pub <- sse_pub
-grid$sse_priv <- sse_priv
-best_pub <- grid[which.min(grid$sse_pub), ]
-best_priv <- grid[which.min(grid$sse_priv), ]
-
-a4 <- ggplot(grid, aes(x = beta0, y = beta1, fill = log(sse_pub))) +
-  geom_tile() +
-  scale_fill_viridis_c(direction = -1) +
-  geom_point(data = best_pub, aes(x = beta0, y = beta1), color = "red", size = 3) +
-  labs(
-    x = expression(beta[0]),
-    y = expression(beta[1]),
-    fill = "Log SSE",
-    title = "(A) Assume Frictionless Private Investment"
-  ) +
-  theme_classic() +
-  theme(
-    plot.margin = margin(t = 5, r = 15, b = 5, l = 5),
-    panel.border = element_rect(colour = "black", fill = NA, linewidth = 0.5),
-    axis.ticks.length = unit(-0.15, "cm"),
-    axis.text.x = element_text(margin = margin(t = 0.3, unit = "cm")),
-    axis.text.y = element_text(margin = margin(r = 0.3, unit = "cm")),
-    axis.title.y = element_text(angle = 0, vjust = 0.5),
-    plot.title = element_text(hjust = 0.5)
+run_panel_long <- function(fml) {
+  base_rhs <- as.character(fml)[3]
+  dv <- as.character(fml)[2]
+  list(
+    "Pooled" = feols(as.formula(paste(dv, "~", base_rhs)), data = f_diff_long_panel),
+    "Country FE" = feols(as.formula(paste(dv, "~", base_rhs, "| countrycode")), data = f_diff_long_panel),
+    "Year FE" = feols(as.formula(paste(dv, "~", base_rhs, "| window")), data = f_diff_long_panel),
+    "Country + Year FE" = feols(as.formula(paste(dv, "~", base_rhs, "| countrycode + window")), data = f_diff_long_panel)
   )
+}
 
-b4 <- ggplot(grid, aes(x = beta0, y = beta1, fill = log(sse_priv))) +
-  geom_tile() +
-  scale_fill_viridis_c(direction = -1) +
-  geom_point(data = best_priv, aes(x = beta0, y = beta1), color = "red", size = 3) +
-  labs(
-    x = expression(beta[0]),
-    y = expression(beta[1]),
-    fill = "Log SSE",
-    title = "(B) Assume Frictionless Public Investment",
-    caption = str_wrap("Notes: Heatmap of log sum of squared residuals. Panel (A) places the wedge on the public capital channel, Panel (B) on the private channel. Red dot indicates the parameter combination minimising SSE. Sources: PWT 11.0, ICSD, WDI.", width = 100)
-  ) +
-  theme_classic() +
-  theme(
-    plot.caption = element_text(hjust = 0, size = 8, face = "italic"),
-    plot.caption.position = "plot",
-    plot.margin = margin(t = 5, r = 15, b = 5, l = 5),
-    panel.border = element_rect(colour = "black", fill = NA, linewidth = 0.5),
-    axis.ticks.length = unit(-0.15, "cm"),
-    axis.text.x = element_text(margin = margin(t = 0.3, unit = "cm")),
-    axis.text.y = element_text(margin = margin(r = 0.3, unit = "cm")),
-    axis.title.y = element_text(angle = 0, vjust = 0.5),
-    plot.title = element_text(hjust = 0.5)
-  )
+models_a_long <- run_panel_long(specs_long$priv)
+models_b_long <- run_panel_long(specs_long$pub)
 
-a4 / b4
+coef_names_long <- c("l(d(log(f_pub_long)), 1)" = "$\\Delta log f'(K^{pub}_{i, [t-5, t-1]})$",
+                     "l(d(log(f_priv_long)), 1)" = "$\\Delta log f'(K^{priv}_{i,[t-5, t-1]})$")
+stars <- c('*' = .05, '**' = .01, '***' = .001)
+gof <- data.frame(raw = c("nobs", "r2.within"), clean = c("Sample Size", "Within $R^2$"), fmt = c("%.0f", "%.3f"))
+
+extract_tbl <- function(mods, coef_map) {
+  df <- modelsummary(mods, coef_map = coef_map, stars = stars, gof_map = gof, output = "data.frame")
+  df$term[df$statistic == "std.error"] <- ""
+  df %>% select(-part, -statistic)
+}
+
+tbl_a_long <- extract_tbl(models_a_long, coef_names_long)
+tbl_b_long <- extract_tbl(models_b_long, coef_names_long)
+
+tbl_a_long$term <- ifelse(tbl_a_long$term != "", paste0("\\quad ", tbl_a_long$term), "")
+tbl_b_long$term <- ifelse(tbl_b_long$term != "", paste0("\\quad ", tbl_b_long$term), "")
+
+hdr <- \(s) tibble(term = s, `Pooled` = "", `Country FE` = "", `Year FE` = "", `Country + Year FE` = "")
+out_long <- bind_rows(hdr("\\textbf{Panel A:} $\\Delta log f'(K^{priv}_{it})$"), tbl_a_long,
+                      hdr("\\textbf{Panel B:} $\\Delta log f'(K^{pub}_{it})$"), tbl_b_long)
+
+n_a <- nrow(tbl_a_long)
+n_b <- nrow(tbl_b_long)
+panel_a_row <- 1
+panel_b_row <- 1 + n_a + 1
+
+out_long %>%
+  kbl(booktabs = TRUE, escape = FALSE, align = "lcccc",
+      col.names = c("", "Pooled", "Country FE", "Year FE", "Country + Year FE")) %>%
+  kable_styling(latex_options = "hold_position") %>%
+  row_spec(panel_a_row, hline_after = TRUE) %>%
+  row_spec(panel_a_row + n_a, hline_after = TRUE) %>%
+  row_spec(panel_b_row, hline_after = TRUE) %>%
+  row_spec(panel_b_row + n_b, hline_after = TRUE) %>%
+  gsub("\\\\end\\{tabular\\}", 
+       "\\\\end{tabular}\n\\\\begin{minipage}{\\\\textwidth}\n\\\\vspace{2pt}\n\\\\footnotesize \\\\textit{Notes:} Long-run specification uses 5-year averaged variables and Bom-Ligthart (2014) national long-run elasticity 0.122. Year FE is applied according to the 5-year windows. First difference removes AR(1) structure. Standard errors clustered at the country level in parentheses. $^{*}p<0.05$, $^{**}p<0.01$, $^{***}p<0.001$.\n\\\\end{minipage}", .)
 ```
 
-### Bounds of Private vs. Public Capital Investment Frictions
+### Ratios between Private and Public Capital Returns {#sec-diff-pp}
 
-To further the findings in @sec-diff-pp and @sec-grid-search, I perform a bounding exercise with aggregate data to quantify to what extent the private and public friction channel can possibly explain the consumption growth gap.
+Recall the equilibrium condition of @eq-ff, I can rewrite: $$\frac{\phi_{it}^{pub}}{\phi_{it}^{priv}} = \frac{f'(K_{it}^{priv})}{f'(K_{it}^{pub})} = \frac{\alpha^{priv}}{\alpha^{pub}_{it}} \left(\frac{K_{it}^{pub}}{K_{it}^{priv}}\right)$$ Using the above condition and the conservative output elasticity of public capital 0.083, @fig-f-diff shows most countries across time have larger public-side wedge compared to the private side, where the marginal returns on private capital investment is higher than public capital investment. This is an indication that the private capital investment frictions are higher on average across levels of development. (**INSERT SENSITIVITY TEST)** However, the red OLS fit shows that this pattern is more prominent on the lower log per capital GDP end, and it attenuates towards the higher end. This pattern is also robust after controlling for country and year fixed effects. **(INSERT ANNEX)** Recall @fig-actual-predict that lower-income countries tend to have higher overall frictions, @fig-f-diff may suggest that the public capital investment frictions contribute less to the overall high frictions in lower-income countries, and the private-side frictions are more likely to be the driving force.
+
+```{r}
+#| label: fig-f-diff
+#| fig-cap: "Ratio of Private to Public Capital Returns by Log GDP per Capita"
+#| fig-cap-location: top
+
+f_diff %>%
+  filter(!is.na(phi), !is.na(gdp_pc), phi > 0) %>%
+  ggplot(aes(x = log(gdp_pc), y = log(phi))) +
+  geom_point(alpha = 0.1, size = 0.5) +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "blue") +
+  geom_smooth(method = "lm", color = "red", se = FALSE) +
+  labs(
+    x = "Log GDP per Capita",
+    y = "Log Ratio of Private to Public Capital Returns",
+    caption = stringr::str_wrap("Notes: Dashed line is when the ratio is 1 (log = 0). Red line is OLS fit. Sources: PWT 11.0, ICSD.", width = 100)
+  ) +
+  theme_classic() +
+  theme(
+    plot.margin = margin(t = 5, r = 15, b = 5, l = 5),
+    panel.border = element_rect(colour = "black", fill = NA, linewidth = 0.5),
+    axis.ticks.length = unit(-0.15, "cm"),
+    axis.text.x = element_text(margin = margin(t = 0.3, unit = "cm")),
+    axis.text.y = element_text(margin = margin(r = 0.3, unit = "cm")),
+    plot.caption = element_text(hjust = 0, size = 8, face = "italic"),
+    plot.caption.position = "plot"
+  )
+```
+
+### Consumption Growth Marginal Sensitivity to Private vs. Public Frictions
 
 ## Implications
 
 \clearpage
 
 ## References {.unnumbered}
+
+::: {#refs}
+:::
+
+\clearpage
+
+\appendix
+
+\renewcommand{\thetable}{A\arabic{table}}
+
+\setcounter{table}{0}
+
+\renewcommand{\thefigure}{A\arabic{figure}}
+
+\setcounter{figure}{0}
+
+## Appendix {.unnumbered}
+
+### Appendix A. Polynomial Fit of Actual on Predicted Consumption Growth, Controlled by Per Capita GDP growth and TFP Growth {#sec-appendix-a .unnumbered}
+
+```{r}
+#| label: tbl-poly-fit-controls
+#| tbl-cap: "Polynomial Fit of Actual on Predicted Consumption Growth, with Controls"
+#| tbl-pos: "H"
+
+reg_data <- pwt_dev %>%
+  group_by(countrycode) %>%
+  arrange(year) %>%
+  mutate(
+    log_y_pc = log(gdp_pc),
+    log_y_growth = log_y_pc - dplyr::lag(log_y_pc),
+    log_tfp_growth = log(rwtfpna) - dplyr::lag(log(rwtfpna))
+  ) %>%
+  ungroup() %>%
+  filter(!is.na(log_y_growth), !is.na(log_tfp_growth),
+         !is.na(log_g_predicted), !is.na(log_g_actual))
+
+poly_models <- list(
+  "Linear" = lm(log_g_actual ~ log_g_predicted + log_y_growth + log_tfp_growth, 
+                data = reg_data),
+  "Quadratic" = lm(log_g_actual ~ poly(log_g_predicted, 2) + log_y_growth + log_tfp_growth, 
+                   data = reg_data),
+  "Cubic" = lm(log_g_actual ~ poly(log_g_predicted, 3) + log_y_growth + log_tfp_growth, 
+               data = reg_data)
+)
+
+coef_names <- c(
+  "log_g_predicted" = "Log Predicted Growth",
+  "poly(log_g_predicted, 2)1" = "Poly term 1",
+  "poly(log_g_predicted, 2)2" = "Poly term 2",
+  "poly(log_g_predicted, 3)1" = "Poly term 1",
+  "poly(log_g_predicted, 3)2" = "Poly term 2",
+  "poly(log_g_predicted, 3)3" = "Poly term 3",
+  "log_y_growth" = "Log GDP Growth",
+  "log_tfp_growth" = "Log TFP Growth",
+  "(Intercept)" = "Intercept"
+)
+
+stars <- c('*' = .05, '**' = .01, '***' = .001)
+gof <- data.frame(
+  raw = c("nobs", "r.squared"),
+  clean = c("Sample Size", "$R^2$"),
+  fmt = c("%.0f", "%.4f")
+)
+
+modelsummary(
+  poly_models,
+  coef_map = coef_names,
+  stars = stars,
+  gof_map = gof,
+  output = "kableExtra",
+  escape = FALSE,
+  align = "lccc"
+) %>%
+  add_header_above(c(" " = 1, "Log Actual Consumption Growth" = 3)) %>%
+  kable_styling(latex_options = "HOLD_position") %>%
+  gsub("\\\\end\\{tabular\\}",
+       "\\\\end{tabular}\n\\\\begin{minipage}{\\\\textwidth}\n\\\\vspace{2pt}\n\\\\footnotesize \\\\textit{Notes:} Orthogonal polynomial regressions of log actual on log predicted consumption growth, controlling for contemporaneous log GDP growth and log TFP growth. Standard errors in parentheses. \n\\\\end{minipage}", .)
+```

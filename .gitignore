@@ -56,3 +56,4 @@ data/icsd2021/*.csv
 
 /.quarto/
 **/*.quarto_ipynb
+.positai
