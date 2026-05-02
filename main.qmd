@@ -5,6 +5,8 @@ include-in-header:
     \usepackage{parskip}
     \setlength{\parskip}{0.5\baselineskip}
     \setlength{\parindent}{2em}
+    \usepackage{pdflscape}
+    \usepackage{rotating}
 format:
   aea-pdf:
     keep-tex: false  
@@ -249,7 +251,7 @@ a1 + b1
 
 ### Endogenous Capital Accumulation {#sec-historical-accumulation}
 
-There is a potential concern for the findings in @fig-actual-predict that the insensitivity of the actual consumption growth rate towards the model prediction signals severe model mis-specification. This would mean that the Euler equation model setup in @sec-baseline cannot capture the true underlying mechanism of consumption growth from capital investment, at least under aggregate data. However, the orthogonal polynomial regressions in @tbl-poly-fit show significant quadratic correlation between the actual and predicted log gross consumption growth rate, while the linear term correlation is not statistically significant . This suggests that a non-trivial relationship between predicted and actual growth does exist. Nonetheless, the small $R^2$ across specifications shows that the baseline model explains only a tiny fraction of the variation in actual consumption growth. \footnote{Appendix A reports significantly higher $R^2$ after adding per captia GDP growth and TFP growth as controls, suggesting more variations are explained by these factors.} Therefore, understanding the puzzle will require identifying the factors that systematically prevent households from exploiting high capital investment returns according to the baseline model prediction.
+There is a potential concern for the findings in @fig-actual-predict that the insensitivity of the actual consumption growth rate towards the model prediction signals severe model mis-specification. This would mean that the Euler equation model setup in @sec-baseline cannot capture the true underlying mechanism of consumption growth from capital investment, at least under aggregate data. However, the orthogonal polynomial regressions in @tbl-poly-fit show significant quadratic correlation between the actual and predicted log gross consumption growth rate, while the linear term correlation is not statistically significant . This suggests that a non-trivial relationship between predicted and actual growth does exist. Nonetheless, the small $R^2$ across specifications shows that the baseline model explains only a tiny fraction of the variation in actual consumption growth.\footnote{Appendix Table A1 reports significantly higher $R^2$ after adding per captia GDP growth and TFP growth as controls, suggesting more variations are explained by these factors.} Therefore, understanding the puzzle will require identifying the factors that systematically prevent households from exploiting high capital investment returns according to the baseline model prediction.
 
 ```{r}
 #| label: tbl-poly-fit
@@ -727,7 +729,7 @@ Countries with high self-employment shares tend to be lower-income countries tha
 
 @tbl-granger-long shows the Granger tests results for long-run private and public capital returns over five-year windows. The coefficients on own-channel returns are larger and more significant compared to the short run across all specifications. The stickier own-channel persistence in the long run is likely due to the five-year window reflecting more long-term structural economic trends like industrial, institutional, or TFP trajectories. However, although the private-to-public spillovers are still small, the magnitude almost doubles and the shrinking significance levels are likely resulted from shrinking sample size. This is likely also related to the coefficient absorbing the long-term trends. The long-run public-to-private spillovers attenuate instead. The increasing within $R^2$ under country and year fixed effect indicate that the long-run model has a better explanatory power.
 
-Recall that the cross-channel spillovers can be over-estimated based on the current models by omitting common investment and structural economic trends. Nonetheless, the small magnitude of cross-channel spillovers likely indicate that the correlation between the two investment channels are likely small. Under the country and year fixed effects, both short-and long-run spillover coefficients are not significant when controlling for total factor productivity, while the Granger tests on log first-differenced capital accumulation level estimate the largest coefficient of public-to-private spillovers of 0.177 ($p < 0.1$) which is still small in magnitude. The overall empirical evidence suggest although spillovers between the private and public friction channels exist, the two investment channels and by extension the fricitons operate largely via separate mechanisms. Therefore, studying the public and private capital investment channels separately is important based on this finding.
+Recall that the cross-channel spillovers can be over-estimated based on the current models by omitting common investment and structural economic trends. Nonetheless, the small magnitude of cross-channel spillovers likely indicate that the correlation between the two investment channels are likely small. Under the country and year fixed effects, both short-and long-run spillover coefficients are not significant when controlling for total factor productivity, while the Granger tests on log first-differenced capital accumulation level estimate the largest coefficient of public-to-private spillovers of 0.177 ($p < 0.1$) which is still small in magnitude.\footnote{See Appendix Table A2.} The overall empirical evidence suggest although spillovers between the private and public friction channels exist, the two investment channels and by extension the frictions operate largely via separate mechanisms. Therefore, studying the public and private capital investment channels separately is important based on this finding.
 
 ```{r}
 #| label: tbl-granger
@@ -870,25 +872,56 @@ out_long %>%
        "\\\\end{tabular}\n\\\\begin{minipage}{\\\\textwidth}\n\\\\vspace{2pt}\n\\\\footnotesize \\\\textit{Notes:} Long-run specification uses 5-year averaged variables and Bom-Ligthart (2014) national long-run elasticity 0.122. Year FE is applied according to the 5-year windows. First difference removes AR(1) structure. Standard errors clustered at the country level in parentheses. $^{*}p<0.05$, $^{**}p<0.01$, $^{***}p<0.001$.\n\\\\end{minipage}", .)
 ```
 
-### Ratios between Private and Public Capital Returns {#sec-diff-pp}
+### Relative Sizes of Frictions Along Development {#sec-diff-pp}
 
-Recall the equilibrium condition of @eq-ff, I can rewrite: $$\frac{\phi_{it}^{pub}}{\phi_{it}^{priv}} = \frac{f'(K_{it}^{priv})}{f'(K_{it}^{pub})} = \frac{\alpha^{priv}}{\alpha^{pub}_{it}} \left(\frac{K_{it}^{pub}}{K_{it}^{priv}}\right)$$ Using the above condition and the conservative output elasticity of public capital 0.083, @fig-f-diff shows most countries across time have larger public-side wedge compared to the private side, where the marginal returns on private capital investment is higher than public capital investment. This is an indication that the private capital investment frictions are higher on average across levels of development. (**INSERT SENSITIVITY TEST)** However, the red OLS fit shows that this pattern is more prominent on the lower log per capital GDP end, and it attenuates towards the higher end. This pattern is also robust after controlling for country and year fixed effects. **(INSERT ANNEX)** Recall @fig-actual-predict that lower-income countries tend to have higher overall frictions, @fig-f-diff may suggest that the public capital investment frictions contribute less to the overall high frictions in lower-income countries, and the private-side frictions are more likely to be the driving force.
+It is difficult to decompose consumption growth induced by private and public capital investment. However, recall the equilibrium condition of @eq-ff, I can rewrite: $$\frac{\phi_{it}^{pub}}{\phi_{it}^{priv}} = \frac{f'(K_{it}^{priv})}{f'(K_{it}^{pub})} = \frac{\alpha^{priv}}{\alpha^{pub}_{it}} \left(\frac{K_{it}^{pub}}{K_{it}^{priv}}\right)$$ Using the above condition and the national and short-run output elasticity of public capital 0.083 in @bom2014, @fig-f-diff Panel (A) shows most countries across time have larger public-side wedge compared to the private side, where the marginal returns on private capital investment is higher than public capital investment. The interpretation would be that the private capital investment frictions might be higher on average across levels of development. However, the red OLS fit shows that this pattern is more prominent on the lower log per capital GDP end, and it attenuates towards the higher end.
+
+Using instead the five-year specification and long-run output elasticity of public capital of 0.122, @fig-f-diff Panel (B) shows more even ratio between private and public side wedge across levels of development compared to Panel (A). The OLS fit exhibits a similar pattern but the public-side wedge becomes substantially smaller than the private-side wedge in higher income countries.
+
+The important caveat for this exercise is that
+
+Recall @fig-actual-predict that lower-income countries tend to have higher overall frictions, @fig-f-diff may suggest that the public capital investment frictions contribute less to the overall high frictions in lower-income countries, and the private-side frictions are more likely to be the driving force.
 
 ```{r}
 #| label: fig-f-diff
 #| fig-cap: "Ratio of Private to Public Capital Returns by Log GDP per Capita"
 #| fig-cap-location: top
+#| fig-height: 8
 
-f_diff %>%
+# Panel A: Short-run
+diff_a <- f_diff %>%
   filter(!is.na(phi), !is.na(gdp_pc), phi > 0) %>%
   ggplot(aes(x = log(gdp_pc), y = log(phi))) +
   geom_point(alpha = 0.1, size = 0.5) +
   geom_hline(yintercept = 0, linetype = "dashed", color = "blue") +
   geom_smooth(method = "lm", color = "red", se = FALSE) +
   labs(
+    title = "(A) Short-Run",
+    x = "Log GDP per Capita",
+    y = "Log Ratio of Private to Public Capital Returns"
+  ) +
+  theme_classic() +
+  theme(
+    plot.margin = margin(t = 5, r = 15, b = 5, l = 5),
+    panel.border = element_rect(colour = "black", fill = NA, linewidth = 0.5),
+    axis.ticks.length = unit(-0.15, "cm"),
+    axis.text.x = element_text(margin = margin(t = 0.3, unit = "cm")),
+    axis.text.y = element_text(margin = margin(r = 0.3, unit = "cm")),
+    plot.title = element_text(hjust = 0.5, size = 11, face = "plain")
+  )
+
+# Panel B: Long-run (5-year averages)
+diff_b <- f_diff %>%
+  filter(!is.na(phi_long), !is.na(gdp_pc), phi_long > 0) %>%
+  ggplot(aes(x = log(gdp_pc), y = log(phi_long))) +
+  geom_point(alpha = 0.1, size = 0.5) +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "blue") +
+  geom_smooth(method = "lm", color = "red", se = FALSE) +
+  labs(
+    title = "(B) Long-Run (5-Year Averages)",
     x = "Log GDP per Capita",
     y = "Log Ratio of Private to Public Capital Returns",
-    caption = stringr::str_wrap("Notes: Dashed line is when the ratio is 1 (log = 0). Red line is OLS fit. Sources: PWT 11.0, ICSD.", width = 100)
+    caption = stringr::str_wrap("Notes: Panel (A) uses contemporaneous values with short-run output elasticity of public capital calibrated at 0.083. Panel (B) uses 5-year averages with long-run output elasticity of public capital calibrated at 0.122. Dashed line indicates ratio of 1 (log = 0). Red line is OLS fit. Sources: PWT 11.0, ICSD.", width = 100)
   ) +
   theme_classic() +
   theme(
@@ -898,11 +931,12 @@ f_diff %>%
     axis.text.x = element_text(margin = margin(t = 0.3, unit = "cm")),
     axis.text.y = element_text(margin = margin(r = 0.3, unit = "cm")),
     plot.caption = element_text(hjust = 0, size = 8, face = "italic"),
-    plot.caption.position = "plot"
+    plot.caption.position = "plot",
+    plot.title = element_text(hjust = 0.5, size = 11, face = "plain")
   )
-```
 
-### Consumption Growth Marginal Sensitivity to Private vs. Public Frictions
+diff_a / diff_b
+```
 
 ## Implications
 
@@ -926,8 +960,6 @@ f_diff %>%
 \setcounter{figure}{0}
 
 ## Appendix {.unnumbered}
-
-### Appendix A. Polynomial Fit of Actual on Predicted Consumption Growth, Controlled by Per Capita GDP growth and TFP Growth {#sec-appendix-a .unnumbered}
 
 ```{r}
 #| label: tbl-poly-fit-controls
@@ -987,4 +1019,135 @@ modelsummary(
   kable_styling(latex_options = "HOLD_position") %>%
   gsub("\\\\end\\{tabular\\}",
        "\\\\end{tabular}\n\\\\begin{minipage}{\\\\textwidth}\n\\\\vspace{2pt}\n\\\\footnotesize \\\\textit{Notes:} Orthogonal polynomial regressions of log actual on log predicted consumption growth, controlling for contemporaneous log GDP growth and log TFP growth. Standard errors in parentheses. \n\\\\end{minipage}", .)
+```
+
+```{r}
+#| label: data-granger-robust
+#| tbl-cap: "Cross-Channel Granger Tests Across Specifications"
+
+f_diff <- f_diff %>%
+  group_by(countrycode, window) %>%
+  mutate(
+    rwtfpna_5y = mean(rwtfpna, na.rm = TRUE),
+    k_pub_5y_mean = mean(k_pub, na.rm = TRUE),
+    k_priv_5y_mean = mean(k_priv, na.rm = TRUE)
+  ) %>%
+  ungroup()
+
+# Short-run panel
+panel_short <- panel(
+  f_diff %>% filter(!is.na(rwtfpna), rwtfpna > 0),
+  ~countrycode + year
+)
+
+# Long-run returns panel
+f_diff_long_collapsed <- f_diff %>%
+  filter(!is.na(rwtfpna_5y), rwtfpna_5y > 0,
+         f_pub_long > 0, f_priv_long > 0) %>%
+  group_by(countrycode, window) %>%
+  dplyr::summarise(
+    f_pub_long = first(f_pub_long),
+    f_priv_long = first(f_priv_long),
+    rwtfpna_5y = first(rwtfpna_5y),
+    .groups = "drop"
+  )
+
+panel_long_returns <- panel(f_diff_long_collapsed, ~countrycode + window)
+
+# Long-run K panel 
+f_diff_long_K <- f_diff %>%
+  filter(!is.na(k_pub_5y_mean), !is.na(k_priv_5y_mean),
+         k_pub_5y_mean > 0, k_priv_5y_mean > 0) %>%
+  group_by(countrycode, window) %>%
+  dplyr::summarise(
+    k_pub_5y = first(k_pub_5y_mean),
+    k_priv_5y = first(k_priv_5y_mean),
+    .groups = "drop"
+  )
+
+panel_long_K <- panel(f_diff_long_K, ~countrycode + window)
+
+# Run all 8 models
+m_priv_short_tfp <- feols(
+  d(log(f_priv)) ~ l(d(log(f_pub)), 1) + l(d(log(f_priv)), 1) + d(log(rwtfpna)) | countrycode + year,
+  data = panel_short
+)
+
+m_pub_short_tfp <- feols(
+  d(log(f_pub)) ~ l(d(log(f_priv)), 1) + l(d(log(f_pub)), 1) + d(log(rwtfpna)) | countrycode + year,
+  data = panel_short
+)
+
+m_priv_long_tfp <- feols(
+  d(log(f_priv_long)) ~ l(d(log(f_pub_long)), 1) + l(d(log(f_priv_long)), 1) + d(log(rwtfpna_5y)) | countrycode + window,
+  data = panel_long_returns
+)
+
+m_pub_long_tfp <- feols(
+  d(log(f_pub_long)) ~ l(d(log(f_priv_long)), 1) + l(d(log(f_pub_long)), 1) + d(log(rwtfpna_5y)) | countrycode + window,
+  data = panel_long_returns
+)
+
+m_priv_K <- feols(
+  d(log(k_priv)) ~ l(d(log(k_pub)), 1) + l(d(log(k_priv)), 1) | countrycode + year,
+  data = panel_short
+)
+
+m_pub_K <- feols(
+  d(log(k_pub)) ~ l(d(log(k_priv)), 1) + l(d(log(k_pub)), 1) | countrycode + year,
+  data = panel_short
+)
+
+m_priv_K_long <- feols(
+  d(log(k_priv_5y)) ~ l(d(log(k_pub_5y)), 1) + l(d(log(k_priv_5y)), 1) | countrycode + window,
+  data = panel_long_K
+)
+
+m_pub_K_long <- feols(
+  d(log(k_pub_5y)) ~ l(d(log(k_priv_5y)), 1) + l(d(log(k_pub_5y)), 1) | countrycode + window,
+  data = panel_long_K
+)
+
+models_list <- list(
+  "$\\Delta\\log f'(K^{priv})$ Short" = m_priv_short_tfp,
+  "$\\Delta\\log f'(K^{pub})$ Short" = m_pub_short_tfp,
+  "$\\Delta\\log f'(K^{priv})$ Long" = m_priv_long_tfp,
+  "$\\Delta\\log f'(K^{pub})$ Long" = m_pub_long_tfp,
+  "$\\Delta\\log K^{priv}$ Short" = m_priv_K,
+  "$\\Delta\\log K^{pub}$ Short" = m_pub_K,
+  "$\\Delta\\log K^{priv}$ Long" = m_priv_K_long,
+  "$\\Delta\\log K^{pub}$ Long" = m_pub_K_long
+)
+
+coef_map <- c(
+  "l(d(log(f_pub)), 1)" = "$\\Delta\\log f'(K^{pub}_{i,t-1})$",
+  "l(d(log(f_priv)), 1)" = "$\\Delta\\log f'(K^{priv}_{i,t-1})$",
+  "l(d(log(f_pub_long)), 1)" = "$\\Delta\\log f'(K^{pub}_{i,w-1})$",
+  "l(d(log(f_priv_long)), 1)" = "$\\Delta\\log f'(K^{priv}_{i,w-1})$",
+  "l(d(log(k_pub)), 1)" = "$\\Delta\\log K^{pub}_{i,t-1}$",
+  "l(d(log(k_priv)), 1)" = "$\\Delta\\log K^{priv}_{i,t-1}$",
+  "l(d(log(k_pub_5y)), 1)" = "$\\Delta\\log K^{pub}_{i,w-1}$",
+  "l(d(log(k_priv_5y)), 1)" = "$\\Delta\\log K^{priv}_{i,w-1}$",
+  "d(log(rwtfpna))" = "$\\Delta\\log \\text{TFP}_{it}$",
+  "d(log(rwtfpna_5y))" = "$\\Delta\\log \\text{TFP}_{iw}$"
+)
+
+stars <- c('*' = .05, '**' = .01, '***' = .001)
+gof <- data.frame(
+  raw = c("nobs", "r2.within"),
+  clean = c("Sample Size", "Within $R^2$"),
+  fmt = c("%.0f", "%.3f")
+)
+
+modelsummary(
+  models_list,
+  coef_map = coef_map,
+  stars = stars,
+  gof_map = gof,
+  escape = FALSE,
+  output = "kableExtra",
+  notes = "Standard errors clustered at country level in parentheses. All specifications include country and year (window for long-run) fixed effects. Returns specifications include contemporaneous TFP control."
+) %>%
+  kable_styling(latex_options = "scale_down") %>%
+  landscape()
 ```
